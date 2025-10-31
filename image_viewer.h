@@ -9,6 +9,7 @@
 #include "window.h"
 
 class ImageViewer : public CWindow {
+  using CWindow::tick;
   public:
     explicit ImageViewer(CPanel *panel);
     virtual ~ImageViewer() = default;

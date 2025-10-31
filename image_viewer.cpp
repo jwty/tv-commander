@@ -213,7 +213,7 @@ bool ImageViewer::keyHold()
 }
 
 #if SDL_VERSION_ATLEAST(2, 0, 0)
-bool CCommander::gamepadHold(SDL_GameController *controller)
+bool ImageViewer::gamepadHold(SDL_GameController *controller)
 {
     const auto &c = config();
     if (tick(controller, c.gamepad_up) || tick(controller, c.gamepad_left)) return actionUp();

@@ -94,10 +94,7 @@ int main(int argc, char *argv[])
 
     // Init SDL
     {
-        std::uint32_t init_flags = SDL_INIT_VIDEO;
-#if SDL_VERSION_ATLEAST(2, 0, 0)
-        init_flags |= SDL_INIT_GAMECONTROLLER;
-#endif
+        std::uint32_t init_flags = SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER;
         SDL_Init(init_flags);
     }
     if (IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP) == 0) {
@@ -118,10 +115,6 @@ int main(int argc, char *argv[])
         std::cerr << "TTF_Init failed: " << SDL_GetError() << std::endl;
         return 1;
     }
-
-#ifndef USE_SDL2
-    SDL_EnableUNICODE(1);
-#endif
 
     // Create instances
     CResourceManager::instance();

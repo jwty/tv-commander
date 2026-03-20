@@ -10,22 +10,6 @@ Screen screen;
 
 namespace {
 
-#ifndef USE_SDL2
-SDL_Surface *SetVideoMode(int width, int height, int bpp, std::uint32_t flags)
-{
-    std::fprintf(stderr, "Setting video mode %dx%d bpp=%u flags=0x%08X\n",
-        width, height, bpp, flags);
-    std::fflush(stderr);
-    auto *result = SDL_SetVideoMode(width, height, bpp, flags);
-    const auto &current = *SDL_GetVideoInfo();
-    std::fprintf(stderr, "Video mode is now %dx%d bpp=%u flags=0x%08X\n",
-        current.current_w, current.current_h, current.vfmt->BitsPerPixel,
-        SDL_GetVideoSurface()->flags);
-    std::fflush(stderr);
-    return result;
-}
-#endif
-
 void MaybeHeuristicAutoscale(const Config &cfg, int best_w, int best_h)
 {
     if (!cfg.disp_autoscale) return;
@@ -59,17 +43,6 @@ int Screen::init()
     screen.actual_w = cfg.disp_width * cfg.disp_ppu_x;
     screen.actual_h = cfg.disp_height * cfg.disp_ppu_y;
 
-#ifndef USE_SDL2
-    const auto &best = *SDL_GetVideoInfo();
-    std::fprintf(stderr,
-        "Best video mode reported as: %dx%d bpp=%d hw_available=%u\n",
-        best.current_w, best.current_h, best.vfmt->BitsPerPixel,
-        best.hw_available);
-    MaybeHeuristicAutoscale(cfg, best.current_w, best.current_h);
-    screen.setPhysicalResolution(best.current_w, best.current_h);
-#endif
-
-#ifdef USE_SDL2
     int window_flags = SDL_WINDOW_RESIZABLE;
     if (cfg.disp_autoscale) window_flags |= SDL_WINDOW_MAXIMIZED;
 
@@ -109,30 +82,13 @@ int Screen::init()
     if (screen.surface == nullptr) {
         SDL_Log("SDL_GetWindowSurface failed: %s", SDL_GetError());
     }
-#else
-    surface = SetVideoMode(screen.actual_w, screen.actual_h, SCREEN_BPP,
-        SDL_SWSURFACE | SDL_RESIZABLE);
-    if (surface == nullptr) {
-        std::fprintf(stderr, "SDL_SetVideoMode failed: %s\n", SDL_GetError());
-        return 1;
-    }
-#endif
     return 0;
 }
 
 int Screen::onResize(int w, int h)
 {
-#ifdef USE_SDL2
     this->surface = SDL_GetWindowSurface(this->window);
     setPhysicalResolution(surface->w, surface->h);
-#else
-    this->surface = SDL_GetVideoSurface();
-    if (this->surface->w < w || this->surface->h < h) {
-        this->surface = SDL_SetVideoMode(
-            w, h, this->surface->format->BitsPerPixel, this->surface->flags);
-    }
-    setPhysicalResolution(w, h);
-#endif
     return 0;
 }
 

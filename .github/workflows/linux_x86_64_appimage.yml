@@ -4,77 +4,22 @@ on: [push]
 
 env:
   BUILD_TYPE: Release
-  # AppImage directory
   APP_DIR: ${{github.workspace}}/AppDir
 
 jobs:
-  linux_appimage_x86_64_sdl1:
+  linux_appimage_x86_64:
     runs-on: ubuntu-22.04
 
     steps:
-    - name: Install APT packages (build dependencies) - SDL1.2
-      run: sudo apt-get update && sudo apt-get install -y -qq libsdl1.2-dev libsdl-image1.2-dev
+    - name: Install APT packages (build dependencies)
+      run: sudo apt-get update && sudo apt-get install -y -qq libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libsdl2-gfx-dev
 
     - uses: actions/checkout@v2
 
     - name: "CMake: Create Build Directory"
       run: cmake -E make_directory ${{github.workspace}}/build
 
-    - name: "CMake: Configure for AppImage - SDL 1.2"
-      shell: bash
-      working-directory: ${{github.workspace}}/build
-      run: |
-        cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DPPU_X=2 -DPPU_Y=2 \
-          -DCMAKE_INSTALL_PREFIX=$APP_DIR/usr -DRES_DIR='"usr/share/commander/res/"' \
-          -DUSE_SDL2=OFF
-
-    - name: "CMake: Build"
-      working-directory: ${{github.workspace}}/build
-      shell: bash
-      run: cmake --build . --config $BUILD_TYPE
-
-    - name: "CMake: Install into AppImage scratch directory"
-      run: cmake --install build
-
-    - name: Download AppImage LinuxDeploy
-      working-directory: ${{github.workspace}}
-      run: |
-        wget --no-verbose https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage && \
-        chmod +x linuxdeploy-x86_64.AppImage
-
-    - name: Package AppImage
-      working-directory: ${{github.workspace}}
-      shell: bash
-      run: |
-        ./linuxdeploy-x86_64.AppImage --appimage-extract-and-run \
-          --appimage-extract-and-run \
-          --appdir="$APP_DIR" \
-          --custom-apprun=packaging/appimage/AppRun \
-          --desktop-file=packaging/commander.desktop \
-          --icon-file="${APP_DIR}/usr/share/icons/hicolor/32x32/apps/commander.png" \
-          --output=appimage
-
-    - name: Upload dist
-      uses: actions/upload-artifact@v2
-      with:
-        name: appimage-x86_64-sdl1
-        path: Commander-*.AppImage
-
-  linux_appimage_x86_64_sdl2:
-    # The vendored SDL_ttf version that we need requires SDL 2.0.10+,
-    # not available on older versions of Ubuntu.
-    runs-on: ubuntu-22.04
-
-    steps:
-    - name: Install APT packages (build dependencies) - SDL2
-      run: sudo apt-get update && sudo apt-get install -y -qq libsdl2-dev libsdl2-image-dev
-
-    - uses: actions/checkout@v2
-
-    - name: "CMake: Create Build Directory"
-      run: cmake -E make_directory ${{github.workspace}}/build
-
-    - name: "CMake: Configure for AppImage - SDL2"
+    - name: "CMake: Configure for AppImage"
       shell: bash
       working-directory: ${{github.workspace}}/build
       run: |
@@ -100,7 +45,6 @@ jobs:
       shell: bash
       run: |
         ./linuxdeploy-x86_64.AppImage --appimage-extract-and-run \
-          --appimage-extract-and-run \
           --appdir="$APP_DIR" \
           --custom-apprun=packaging/appimage/AppRun \
           --desktop-file=packaging/commander.desktop \
@@ -110,5 +54,5 @@ jobs:
     - name: Upload dist
       uses: actions/upload-artifact@v2
       with:
-        name: appimage-x86_64-sdl2
+        name: appimage-x86_64
         path: Commander-*.AppImage

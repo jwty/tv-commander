@@ -143,9 +143,7 @@ void CKeyboard::init()
     text_field_rect_.w = keyboard_.width;
     text_field_rect_.h = kTextFieldHeight * screen.ppu_y;
     text_edit_.setDimensions(text_field_rect_.w, text_field_rect_.h);
-#ifdef USE_SDL2
     SDL_SetTextInputRect(&text_field_rect_);
-#endif
 
     kb_buttons_rect_.x = frame_padding_x_;
     kb_buttons_rect_.y = text_field_rect_.y + text_field_rect_.h
@@ -435,13 +433,11 @@ bool CKeyboard::keyPress(
         return true;
     }
 
-#ifdef USE_SDL2
     // Paste on CTRL + V
     if (key == SDLK_v && SDL_GetModState() & KMOD_CTRL) {
         text_edit_.typeText(SDL_GetClipboardText());
         return true;
     }
-#endif
 
     if (event.type == SDL_KEYDOWN) {
         switch (key) {
@@ -449,17 +445,7 @@ bool CKeyboard::keyPress(
             case SDLK_DELETE: return text_edit_.del();
             case SDLK_HOME: return text_edit_.setCursorToStart();
             case SDLK_END: return text_edit_.setCursorToEnd();
-            default:
-#ifndef USE_SDL2
-                if ((event.key.keysym.unicode & 0xFF80) == 0) {
-                    const unsigned char c = event.key.keysym.unicode & 0x7F;
-                    if (std::isprint(c)) {
-                        text_edit_.typeText(c);
-                        return true;
-                    }
-                }
-#endif
-                return false;
+            default: return false;
         }
     }
     return false;
@@ -467,7 +453,6 @@ bool CKeyboard::keyPress(
 
 bool CKeyboard::textInput(const SDL_Event &event)
 {
-#ifdef USE_SDL2
     switch (event.type) {
         case SDL_TEXTINPUT:
             // Pasting is handled in `keyPress`.
@@ -480,7 +465,6 @@ bool CKeyboard::textInput(const SDL_Event &event)
             // TODO: Render IME preview.
             return false;
     }
-#endif
     return false;
 }
 
@@ -517,7 +501,6 @@ bool CKeyboard::keyHold()
     return false;
 }
 
-#if SDL_VERSION_ATLEAST(2, 0, 0)
 bool CKeyboard::gamepadHold(SDL_GameController *controller)
 {
     const auto &c = config();
@@ -532,7 +515,6 @@ bool CKeyboard::gamepadHold(SDL_GameController *controller)
         return actionOperation(); // X => Space
     return false;
 }
-#endif
 
 bool CKeyboard::mouseDown(int button, int x, int y)
 {

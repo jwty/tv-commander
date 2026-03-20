@@ -1,15 +1,11 @@
 #include <iostream>
 
-#include <SDL_image.h>
-#ifdef USE_SDL2
-#include <SDL2_rotozoom.h>
-#else
-#include <SDL_rotozoom.h>
-#endif
-#include "resourceManager.h"
 #include "def.h"
+#include "resourceManager.h"
 #include "screen.h"
 #include "sdlutils.h"
+#include <SDL2_rotozoom.h>
+#include <SDL_image.h>
 
 namespace {
 
@@ -27,12 +23,7 @@ SDLSurfaceUniquePtr LoadIcon(const std::string &path) {
         scaled = SDLSurfaceUniquePtr { zoomSurface(img, screen.ppu_x / 2, screen.ppu_y / 2, SMOOTHING_ON) };
     }
     SDL_FreeSurface(img);
-#ifdef USE_SDL2
     return scaled;
-#else
-    SDLSurfaceUniquePtr display { SDL_DisplayFormatAlpha(scaled.get()) };
-    return display;
-#endif
 }
 
 struct FontSpec {

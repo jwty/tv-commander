@@ -3,18 +3,14 @@
 #include <algorithm>
 #include <iostream>
 
-#include <SDL_image.h>
-#ifdef USE_SDL2
-#include <SDL2_rotozoom.h>
-#else
-#include <SDL_rotozoom.h>
-#endif
 #include "def.h"
 #include "fileutils.h"
 #include "resourceManager.h"
 #include "screen.h"
-#include "sdl_ttf_multifont.h"
 #include "sdl_ptrs.h"
+#include "sdl_ttf_multifont.h"
+#include <SDL2_rotozoom.h>
+#include <SDL_image.h>
 
 namespace SDL_utils {
 
@@ -55,16 +51,10 @@ SDLSurfaceUniquePtr loadImageToFit(
 
     const std::string ext = File_utils::getLowercaseFileExtension(p_filename);
     const bool supports_alpha = ext != "xcf" && ext != "jpg" && ext != "jpeg";
-#ifdef USE_SDL2
     auto l_img3 = supports_alpha
         ? std::move(l_img2)
         : SDLSurfaceUniquePtr { SDL_ConvertSurface(
-            l_img2.get(), screen.surface->format, SDL_SWSURFACE) };
-#else
-    SDLSurfaceUniquePtr l_img3 { supports_alpha
-            ? SDL_DisplayFormatAlpha(l_img2.get())
-            : SDL_DisplayFormat(l_img2.get()) };
-#endif
+              l_img2.get(), screen.surface->format, SDL_SWSURFACE) };
     return l_img3;
 }
 

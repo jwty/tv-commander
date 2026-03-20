@@ -55,11 +55,9 @@ void ResetFrameDeadline() {
 
 int CWindow::execute()
 {
-#ifdef USE_SDL2
     const bool text_input_was_active = SDL_IsTextInputActive();
     SDL_StopTextInput();
     if (handlesTextInput()) SDL_StartTextInput();
-#endif
     m_retVal = 0;
     SDL_Event event;
     bool l_loop(true);
@@ -80,14 +78,6 @@ int CWindow::execute()
                 case SDL_MOUSEBUTTONDOWN:
                     SDL_utils::setMouseCursorEnabled(true);
                     switch (event.button.button) {
-#ifndef USE_SDL2
-                        case SDL_BUTTON_WHEELUP:
-                            l_render = mouseWheel(0, 1) || l_render;
-                            break;
-                        case SDL_BUTTON_WHEELDOWN:
-                            l_render = mouseWheel(0, -1) || l_render;
-                            break;
-#endif
                         default:
                             l_render = this->mouseDown(event.button.button,
                                            event.button.x, event.button.y)
@@ -108,7 +98,6 @@ int CWindow::execute()
                     break;
                 }
                 case SDL_QUIT: return m_retVal;
-#ifdef USE_SDL2
                 case SDL_CONTROLLERDEVICEADDED:
                     SDL_GameControllerOpen(event.cdevice.which);
                     break;
@@ -179,20 +168,11 @@ int CWindow::execute()
                             break;
                     }
                     break;
-#else
-                case SDL_VIDEORESIZE:
-                    l_render = true;
-                    ResetFrameDeadline();
-                    screen.onResize(event.resize.w, event.resize.h);
-                    triggerOnResize();
-                    break;
-#endif
             }
         }
         // Handle key hold
         if (!l_loop) break;
 
-#if SDL_VERSION_ATLEAST(2, 0, 0)
         const int num_joysticks = SDL_NumJoysticks();
         for (int i = 0; i < num_joysticks; ++i) {
             if (!SDL_IsGameController(i)) continue;
@@ -217,7 +197,6 @@ int CWindow::execute()
                                                        : ControllerButton::DOWN)
                 || l_render;
         }
-#endif
 
         l_render = this->keyHold() || l_render;
         // Render if necessary
@@ -230,10 +209,8 @@ int CWindow::execute()
         LimitFrameRate();
     }
 
-#ifdef USE_SDL2
     SDL_StopTextInput();
     if (text_input_was_active) SDL_StartTextInput();
-#endif
 
     // -1 is used to signal cancellation but we must return 0 in that case.
     if (m_retVal == -1) m_retVal = 0;
@@ -280,13 +257,11 @@ bool CWindow::keyPress(
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 bool CWindow::keyHold() { return false; }
 
-#if SDL_VERSION_ATLEAST(2, 0, 0)
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 bool CWindow::gamepadHold([[maybe_unused]] SDL_GameController *controller)
 {
     return false;
 }
-#endif
 
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 bool CWindow::textInput([[maybe_unused]] const SDL_Event &event)
@@ -299,12 +274,8 @@ void CWindow::onResize() { }
 bool CWindow::tick(SDLC_Keycode keycode)
 {
     if (m_lastPressed != keycode) return false;
-#if SDL_VERSION_ATLEAST(2, 0, 0)
     const bool held
         = SDL_GetKeyboardState(NULL)[SDL_GetScancodeFromKey(keycode)];
-#else
-    const bool held = SDL_GetKeyState(NULL)[keycode];
-#endif
     if (held) {
         if (m_keyHoldCountdown != 0) {
             --m_keyHoldCountdown;
@@ -325,7 +296,6 @@ bool CWindow::tick(SDLC_Keycode keycode)
     return false;
 }
 
-#if SDL_VERSION_ATLEAST(2, 0, 0)
 bool CWindow::tick(SDL_GameController *controller, ControllerButton button)
 {
     if (controller == nullptr || m_lastPressedButton != button) return false;
@@ -348,7 +318,6 @@ bool CWindow::tick(SDL_GameController *controller, ControllerButton button)
     }
     return false;
 }
-#endif
 
 bool CWindow::mouseDown(int button, int x, int y) { return false; }
 bool CWindow::mouseWheel(int dx, int dy) { return false; }

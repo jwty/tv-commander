@@ -4,13 +4,12 @@
 //~ #define INHIBIT(X) X
 #define INHIBIT(X) /* X */
 
-#ifndef FONTS
-#define FONTS {"/usr/share/fonts/truetype/dejavu/DejaVuSansCondensed.ttf",10},{"FreeSans.ttf",10},{"DroidSansFallback.ttf",9}
+#ifndef FONT_PRIMARY_SIZE
+#define FONT_PRIMARY_SIZE 8
 #endif
 
-// Font stack to use on screens with low DPI.
-#ifndef LOW_DPI_FONTS
-#define LOW_DPI_FONTS {"Fiery_Turk.ttf",8},{"/usr/share/fonts/truetype/dejavu/DejaVuSansCondensed.ttf",10},{"FreeSans.ttf",10},{"DroidSansFallback.ttf",9}
+#ifndef FONT_FALLBACK_SIZE
+#define FONT_FALLBACK_SIZE 7
 #endif
 
 // Panel

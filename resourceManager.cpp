@@ -1,5 +1,8 @@
 #include <iostream>
 
+#include <fontconfig/fontconfig.h>
+
+#include "config.h"
 #include "def.h"
 #include "resourceManager.h"
 #include "screen.h"
@@ -26,40 +29,68 @@ SDLSurfaceUniquePtr LoadIcon(const std::string &path) {
     return scaled;
 }
 
-struct FontSpec {
-    const char *const path;
-    int size;
-};
-static constexpr FontSpec kFonts[] = {FONTS};
-static constexpr std::size_t kFontsLen = sizeof(kFonts) / sizeof(kFonts[0]);
-static constexpr FontSpec kLowDpiFonts[] = {LOW_DPI_FONTS};
-static constexpr std::size_t kLowDpiFontsLen = sizeof(kLowDpiFonts) / sizeof(kLowDpiFonts[0]);
-
 std::string ResDir = RES_DIR "";
 
 std::string ResPath(const char *path) { return ResDir + path; }
 std::string ResPath(const std::string &path) { return ResDir + path; }
 
-std::vector<TTF_Font *> LoadFonts(bool low_dpi) {
-    const FontSpec *specs = low_dpi ? kLowDpiFonts : kFonts;
-    const std::size_t len = low_dpi ? kLowDpiFontsLen : kFontsLen;
+std::string ResolveFontPath(const std::string &family) {
+    FcPattern *pattern = FcPatternCreate();
+    if (!pattern) return { };
 
+    FcPatternAddString(pattern, FC_FAMILY, reinterpret_cast<const FcChar8 *>(family.c_str()));
+
+    FcConfigSubstitute(nullptr, pattern, FcMatchPattern);
+    FcDefaultSubstitute(pattern);
+
+    FcResult result;
+    FcPattern *match = FcFontMatch(nullptr, pattern, &result);
+    FcPatternDestroy(pattern);
+
+    if (!match) return { };
+
+    FcChar8 *filename = nullptr;
+    FcPatternGetString(match, FC_FILE, 0, &filename);
+    std::string path = reinterpret_cast<const char *>(filename);
+    FcPatternDestroy(match);
+
+    return path;
+}
+
+std::vector<TTF_Font *> LoadFonts() {
     std::vector<TTF_Font *> fonts;
-    fonts.reserve(len);
-    for (std::size_t i = 0; i < len; ++i) {
-        const std::string &path = specs[i].path;
-        auto *font = SDL_utils::loadFont(path.front() == '/' ? path : ResPath(path), specs[i].size);
-        if (font != nullptr) fonts.push_back(font);
+
+    const int primary_size = static_cast<int>(FONT_PRIMARY_SIZE * screen.ppu_y + 0.5f);
+    const int fallback_size = static_cast<int>(FONT_FALLBACK_SIZE * screen.ppu_y + 0.5f);
+
+    const std::string &primary = config().font_primary;
+    if (!primary.empty()) {
+        std::string path = ResolveFontPath(primary);
+        if (!path.empty()) {
+            auto *font = SDL_utils::loadFont(path, primary_size);
+            if (font) fonts.push_back(font);
+        }
+        if (fonts.empty()) {
+            std::cerr << "Failed to load primary font: " << primary << std::endl;
+        }
     }
+
+    const std::string &fallback = config().font_fallback;
+    if (!fallback.empty()) {
+        std::string path = ResolveFontPath(fallback);
+        if (!path.empty()) {
+            auto *font = SDL_utils::loadFont(path, fallback_size);
+            if (font) fonts.push_back(font);
+        } else {
+            std::cerr << "Failed to resolve fallback font: " << fallback << std::endl;
+        }
+    }
+
     if (fonts.empty()) {
         std::cerr << "No fonts found!" << std::endl;
         exit(1);
     }
     return fonts;
-}
-
-bool ShouldUseLowDpiFonts() {
-    return screen.ppu_x <= 1.0 && kFonts[0].size < 12;
 }
 
 } // namespace
@@ -78,8 +109,7 @@ CResourceManager& CResourceManager::instance()
 }
 
 CResourceManager::CResourceManager()
-    : m_low_dpi_fonts(false)
-    , m_fonts({})
+    : m_fonts({})
     , m_ppu_x(0)
     , m_ppu_y(0)
 {
@@ -109,12 +139,9 @@ void CResourceManager::onResize()
             SDL_MapRGB(screen.surface->format, COLOR_CURSOR_2))
     };
 
-    const bool low_dpi_fonts = ShouldUseLowDpiFonts();
-    if (m_low_dpi_fonts != low_dpi_fonts || screen.ppu_x != m_ppu_x
-        || screen.ppu_y != m_ppu_y) {
-        m_low_dpi_fonts = low_dpi_fonts;
+    if (screen.ppu_x != m_ppu_x || screen.ppu_y != m_ppu_y) {
         closeFonts();
-        m_fonts = Fonts { LoadFonts(m_low_dpi_fonts) };
+        m_fonts = Fonts { LoadFonts() };
     }
     m_ppu_x = screen.ppu_x;
     m_ppu_y = screen.ppu_y;
@@ -123,6 +150,7 @@ void CResourceManager::onResize()
 void CResourceManager::sdlCleanup() {
     for (auto &surface : m_surfaces) surface = nullptr;
     closeFonts();
+    FcFini();
 }
 
 void CResourceManager::closeFonts() {

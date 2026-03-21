@@ -12,7 +12,7 @@
 
 class CResourceManager
 {
-    public:
+  public:
 
     static void SetResDir(const char *res_dir);
 
@@ -47,7 +47,7 @@ class CResourceManager
     // Get the loaded fonts
     const Fonts &getFonts(void) const;
 
-    private:
+  private:
 
     // Forbidden
     CResourceManager();
@@ -58,7 +58,6 @@ class CResourceManager
     std::array<SDLSurfaceUniquePtr, 9> m_surfaces {};
 
     // Fonts
-    bool m_low_dpi_fonts;
     Fonts m_fonts;
 
     // PPU values when the resources were loaded.

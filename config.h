@@ -31,6 +31,10 @@ struct Config {
     // Resources directory (e.g. icons).
     std::string res_dir { RES_DIR };
 
+    // Font configuration
+    std::string font_primary = "monospace";
+    std::string font_fallback;
+
     // Keyboard key code mappings
     SDLC_Keycode key_down = CMDR_KEY_DOWN;
     SDLC_Keycode key_left = CMDR_KEY_LEFT;
@@ -44,7 +48,6 @@ struct Config {
     SDLC_Keycode key_system = CMDR_KEY_SYSTEM;
     SDLC_Keycode key_transfer = CMDR_KEY_TRANSFER;
     SDLC_Keycode key_up = CMDR_KEY_UP;
-
 
     // Gamepad mappings (only used with SDL2)
     ControllerButton gamepad_down = CMDR_GAMEPAD_DOWN;

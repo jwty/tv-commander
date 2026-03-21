@@ -84,9 +84,7 @@ void processEnvValue(std::string *value)
 }
 
 bool parseBool(const std::string &value)
-{
-    return value == "1" || value == "true";
-}
+{ return value == "1" || value == "true"; }
 
 SDLC_Keycode parseKeycode(const std::string &value)
 {
@@ -207,6 +205,9 @@ void Config::Load(const std::string &path)
     processEnvValue(&file_system);
     CFG_STR(res_dir)
     processEnvValue(&res_dir);
+
+    CFG_STR(font_primary)
+    CFG_STR(font_fallback)
 
     CFG_BOOL(osk_key_system_is_backspace)
 

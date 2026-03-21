@@ -54,12 +54,14 @@ pkg_check_modules(SDL2 REQUIRED IMPORTED_TARGET sdl2)
 pkg_check_modules(SDL2_image REQUIRED IMPORTED_TARGET SDL2_image)
 pkg_check_modules(SDL2_ttf REQUIRED IMPORTED_TARGET SDL2_ttf)
 pkg_check_modules(SDL2_gfx REQUIRED IMPORTED_TARGET SDL2_gfx)
+pkg_check_modules(fontconfig REQUIRED IMPORTED_TARGET fontconfig)
 
 target_link_libraries(${BIN_TARGET} PRIVATE
   PkgConfig::SDL2
   PkgConfig::SDL2_image
   PkgConfig::SDL2_ttf
   PkgConfig::SDL2_gfx
+  PkgConfig::fontconfig
   m
 )
 
@@ -85,7 +87,3 @@ install(
   DIRECTORY "${PROJECT_SOURCE_DIR}/res"
   DESTINATION share/commander
   FILES_MATCHING PATTERN "*.png")
-install(
-  DIRECTORY "${PROJECT_SOURCE_DIR}/res"
-  DESTINATION share/commander
-  FILES_MATCHING PATTERN "*.ttf")

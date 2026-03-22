@@ -462,8 +462,14 @@ enum class OpenFileResult
 {
     CANCEL,
     VIEW,
+    OPEN_EXTERNAL,
     EXECUTE
 };
+
+bool hasExternalOpener()
+{
+    return std::system("which xdg-open > /dev/null 2>&1") == 0;
+}
 
 OpenFileResult OpenFileDialog(const std::string &path,
     std::function<Sint16()> x_fn = {}, std::function<Sint16()> y_fn = {})
@@ -473,8 +479,22 @@ OpenFileResult OpenFileDialog(const std::string &path,
     if (File_utils::getLowercaseFileExtension(path) == "opk")
         return OpenFileResult::EXECUTE;
 
-    if (!info.executable()) return OpenFileResult::VIEW;
+    if (!info.executable()) {
+        // Non-executable: only show View and Open with (if available)
+        CDialog dlg { File_utils::getFileName(path) + ":" };
+        std::vector<OpenFileResult> options { OpenFileResult::CANCEL };
+        const auto add_option = [&](std::string text, OpenFileResult value) {
+            dlg.addOption(text);
+            options.push_back(value);
+        };
+        add_option("View", OpenFileResult::VIEW);
+        if (hasExternalOpener())
+            add_option("Open", OpenFileResult::OPEN_EXTERNAL);
+        dlg.init();
+        return options[dlg.execute()];
+    }
 
+    // Executable: show View, Open with (if available), Execute
     CDialog dlg { File_utils::getFileName(path) + ":" };
     std::vector<OpenFileResult> options { OpenFileResult::CANCEL };
     const auto add_option = [&](std::string text, OpenFileResult value) {
@@ -482,6 +502,8 @@ OpenFileResult OpenFileDialog(const std::string &path,
         options.push_back(value);
     };
     add_option("View", OpenFileResult::VIEW);
+    if (hasExternalOpener())
+        add_option("Open", OpenFileResult::OPEN_EXTERNAL);
     add_option("Execute", OpenFileResult::EXECUTE);
     dlg.init();
     return options[dlg.execute()];
@@ -517,6 +539,9 @@ void CCommander::openExecuteMenu(void) const
     {
         case OpenFileResult::VIEW:
             ViewFile(m_panelSource->getHighlightedItemFull());
+            break;
+        case OpenFileResult::OPEN_EXTERNAL:
+            File_utils::openWithExternal(m_panelSource->getHighlightedItemFull());
             break;
         case OpenFileResult::EXECUTE:
             File_utils::executeFile(m_panelSource->getHighlightedItemFull());

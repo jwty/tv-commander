@@ -382,6 +382,23 @@ void File_utils::createFile(const std::string &p_file)
     Run("sync", p_file);
 }
 
+void File_utils::openWithExternal(const std::string &path)
+{
+    CDialog dlg {"Open with default application?"};
+    dlg.addLabel("File: " + getFileName(path));
+    dlg.addLabel("Note: App may not be gamepad-controllable");
+    dlg.addOption("Open");
+    dlg.addOption("Cancel");
+    dlg.init();
+
+    if (dlg.execute() != 1) return;
+
+    if (fork() == 0) {
+        ::execlp("xdg-open", "xdg-open", path.c_str(), nullptr);
+        ::_exit(127);
+    }
+}
+
 const bool File_utils::fileExists(const std::string &p_path)
 {
     struct stat l_stat;

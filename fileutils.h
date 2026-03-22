@@ -22,6 +22,8 @@ namespace File_utils
 
     void createFile(const std::string &p_file);
 
+    void openWithExternal(const std::string &path);
+
     void renameFile(const std::string &p_file1, const std::string &p_file2);
 
     // File utilities

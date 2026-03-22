@@ -24,9 +24,6 @@ struct Config {
     // Used if `path_default_right` does not exist or left path == right path.
     std::string path_default_right_fallback;
 
-    // Default filesystem for Disk info
-    std::string file_system = FILE_SYSTEM;
-
     // Font configuration
     std::string font_primary = "monospace";
     std::string font_fallback;

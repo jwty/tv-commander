@@ -200,8 +200,6 @@ void Config::Load(const std::string &path)
     processEnvValue(&path_default_right);
     CFG_STR(path_default_right_fallback)
     processEnvValue(&path_default_right_fallback);
-    CFG_STR(file_system)
-    processEnvValue(&file_system);
 
     CFG_STR(font_primary)
     CFG_STR(font_fallback)

@@ -39,10 +39,6 @@
 #define PATH_DEFAULT_RIGHT getenv("HOME")
 #endif
 
-#ifndef FILE_SYSTEM
-#define FILE_SYSTEM "/dev/sda4"
-#endif
-
 #ifndef CMDR_KEY_UP
 #define CMDR_KEY_UP SDLK_UP
 #endif

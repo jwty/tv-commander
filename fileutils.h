@@ -42,7 +42,7 @@ namespace File_utils
 
     // Dialogs
 
-    void diskInfo(void);
+    void diskInfo(const std::string &path);
 
     void diskUsed(const std::vector<std::string> &p_files);
 }

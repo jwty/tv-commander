@@ -444,7 +444,7 @@ const bool CCommander::openSystemMenu(void)
             break;
         case 6:
             // Disk info
-            File_utils::diskInfo();
+            File_utils::diskInfo(m_panelSource->getCurrentPath());
             break;
         case 7:
             // Quit

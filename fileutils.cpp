@@ -455,15 +455,19 @@ const unsigned long int File_utils::getFileSize(const std::string &p_file)
     return l_stat.st_size;
 }
 
-void File_utils::diskInfo(void)
+void File_utils::diskInfo(const std::string &path)
 {
+    if (path.empty()) {
+        ErrorDialog("Error getting disk info", "Invalid path");
+        return;
+    }
+
     std::string l_line("");
     SDL_utils::pleaseWait();
-    const auto &c = config();
-    // Execute command df -h
+    // Execute df -h with the given path
     {
         char l_buffer[256];
-        std::string df_command = "df -h " + c.file_system;
+        std::string df_command = "df -h " + path;
         FILE *l_pipe = popen(df_command.c_str(), "r");
         if (l_pipe == NULL)
         {
@@ -471,8 +475,12 @@ void File_utils::diskInfo(void)
             return;
         }
         while (
-            l_line.empty() && fgets(l_buffer, sizeof(l_buffer), l_pipe) != NULL)
-            if (strstr(l_buffer, c.file_system.c_str()) != NULL) l_line = l_buffer;
+            l_line.empty() && fgets(l_buffer, sizeof(l_buffer), l_pipe) != NULL) {
+            if (strstr(l_buffer, path.c_str()) != NULL 
+                || strstr(l_buffer, "/dev/") != NULL) {
+                l_line = l_buffer;
+            }
+        }
         pclose(l_pipe);
     }
     if (!l_line.empty())
@@ -483,18 +491,22 @@ void File_utils::diskInfo(void)
         std::copy(std::istream_iterator<std::string>(l_iss),
             std::istream_iterator<std::string>(),
             std::back_inserter<std::vector<std::string>>(l_tokens));
-        // Display dialog
-        CDialog l_dialog{"Disk information:"};
-        l_dialog.addLabel("Size: " + l_tokens[1]);
-        l_dialog.addLabel("Used: " + l_tokens[2] + " (" + l_tokens[4] + ")");
-        l_dialog.addLabel("Available: " + l_tokens[3]);
-        l_dialog.addOption("OK");
-        l_dialog.init();
-        l_dialog.execute();
+        if (l_tokens.size() >= 4) {
+            // Display dialog
+            CDialog l_dialog{"Disk information:"};
+            l_dialog.addLabel("Size: " + l_tokens[1]);
+            l_dialog.addLabel("Used: " + l_tokens[2] + " (" + l_tokens[4] + ")");
+            l_dialog.addLabel("Available: " + l_tokens[3]);
+            l_dialog.addOption("OK");
+            l_dialog.init();
+            l_dialog.execute();
+        } else {
+            ErrorDialog("Error getting disk info", "Unexpected output format");
+        }
     }
     else
         ErrorDialog(
-            "Error getting disk info", std::string(c.file_system) + " not found");
+            "Error getting disk info", "Could not find disk info for " + path);
 }
 
 void File_utils::diskUsed(const std::vector<std::string> &p_files)

@@ -20,6 +20,8 @@ namespace File_utils
 
     void makeDirectory(const std::string &p_file);
 
+    void createFile(const std::string &p_file);
+
     void renameFile(const std::string &p_file1, const std::string &p_file2);
 
     // File utilities

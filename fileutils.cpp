@@ -4,6 +4,7 @@
 #include <cerrno>
 #include <cstdlib>
 #include <cstring>
+#include <fstream>
 #include <functional>
 #include <iostream>
 #include <iterator>
@@ -368,6 +369,17 @@ void File_utils::makeDirectory(const std::string &p_file)
     auto result = Run("mkdir", "-p", p_file);
     if (result.ok()) result = Run("sync", p_file);
     if (!result.ok()) ErrorDialog("Error creating " + p_file, result.message());
+}
+
+void File_utils::createFile(const std::string &p_file)
+{
+    std::ofstream out(p_file);
+    if (!out) {
+        ErrorDialog("Error creating " + p_file, std::strerror(errno));
+        return;
+    }
+    out.close();
+    Run("sync", p_file);
 }
 
 const bool File_utils::fileExists(const std::string &p_path)

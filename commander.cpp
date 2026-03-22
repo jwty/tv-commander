@@ -396,6 +396,7 @@ const bool CCommander::openSystemMenu(void)
         l_dialog.addOption("Select all");
         l_dialog.addOption("Select none");
         l_dialog.addOption("New directory");
+        l_dialog.addOption("New file");
         l_dialog.addOption("Disk info");
         l_dialog.addOption("Quit");
         l_dialog.init();
@@ -424,10 +425,22 @@ const bool CCommander::openSystemMenu(void)
             }
             break;
         case 4:
+            // New file
+            {
+                CKeyboard l_keyboard("");
+                if (l_keyboard.execute() == 1 && !l_keyboard.getInputText().empty())
+                {
+                    File_utils::createFile(m_panelSource->getCurrentPath() + (m_panelSource->getCurrentPath() == "/" ? "" : "/") + l_keyboard.getInputText());
+                    m_panelSource->refresh();
+                    l_ret = true;
+                }
+            }
+            break;
+        case 5:
             // Disk info
             File_utils::diskInfo();
             break;
-        case 5:
+        case 6:
             // Quit
             m_retVal = -1;
             break;

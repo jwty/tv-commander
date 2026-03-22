@@ -12,6 +12,7 @@
 #include "fileutils.h"
 #include "image_viewer.h"
 #include "keyboard.h"
+#include "palette.h"
 #include "resourceManager.h"
 #include "screen.h"
 #include "sdlutils.h"
@@ -35,7 +36,7 @@ SDL_Surface *DrawBackground() {
     // Stripes
     const int stripes_h = screen.actual_h - header_h - footer_h;
     SDL_Rect rect = SDL_utils::makeRect(0, 0, screen.actual_w, screen.actual_h);
-    const Uint32 bg_colors[2] = {SDL_MapRGB(bg->format, COLOR_BG_1), SDL_MapRGB(bg->format, COLOR_BG_2)};
+    const Uint32 bg_colors[2] = {toPixel(bg->format, g_palette.bg_normal), toPixel(bg->format, g_palette.bg_alternate)};
     const std::size_t num_lines = (stripes_h - 1) / line_h + 1;
     for (std::size_t i = 0; i < num_lines; ++i) {
         rect.y = list_y + i * line_h;
@@ -43,7 +44,7 @@ SDL_Surface *DrawBackground() {
     }
 
     // Top and bottom bars
-    const auto bar_color = SDL_MapRGB(bg->format, COLOR_TITLE_BG);
+    const auto bar_color = toPixel(bg->format, g_palette.panel);
     rect = SDL_utils::makeRect(0, 0, bg->w, list_y);
     SDL_FillRect(bg, &rect, bar_color);
     rect.y = bg->h - footer_h;

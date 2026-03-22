@@ -206,7 +206,7 @@ void Config::Load(const std::string &path)
     CFG_STR(font_primary)
     CFG_STR(font_fallback)
 
-    CFG_STR(icon_color)
+    CFG_BOOL(dark_mode)
 
     CFG_BOOL(osk_key_system_is_backspace)
 

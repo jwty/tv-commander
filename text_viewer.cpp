@@ -8,6 +8,7 @@
 #include "def.h"
 #include "error_dialog.h"
 #include "keyboard.h"
+#include "palette.h"
 #include "resourceManager.h"
 #include "screen.h"
 #include "sdlutils.h"
@@ -86,11 +87,11 @@ void TextViewer::init()
     const auto &fonts = CResourceManager::instance().getFonts();
 
     const SDL_PixelFormat *pixel_format = screen.surface->format;
-    border_color_ = SDL_MapRGB(pixel_format, COLOR_BORDER);
-    sdl_bg_color_ = SDL_Color { COLOR_BG_1 };
-    bg_color_ = SDL_MapRGB(pixel_format, COLOR_BG_1);
-    sdl_highlight_color_ = SDL_Color { COLOR_CURSOR_1 };
-    highlight_color_ = SDL_MapRGB(pixel_format, COLOR_CURSOR_1);
+    border_color_ = toPixel(pixel_format, g_palette.panel);
+    sdl_bg_color_ = g_palette.bg_normal;
+    bg_color_ = toPixel(pixel_format, g_palette.bg_normal);
+    sdl_highlight_color_ = g_palette.bg_selection;
+    highlight_color_ = toPixel(pixel_format, g_palette.bg_selection);
 
     // Create background image
     background_ = SDLSurfaceUniquePtr { SDL_utils::createImage(
@@ -102,7 +103,7 @@ void TextViewer::init()
     // Print title
     {
         SDLSurfaceUniquePtr tmp { SDL_utils::renderText(
-            fonts, filename_, Globals::g_colorTextTitle, { COLOR_TITLE_BG }) };
+            fonts, filename_, g_palette.text_header, g_palette.panel) };
         SDL_Rect rect;
         SDL_Rect *clip_rect = nullptr;
         if (tmp->w > background_->w - 2 * VIEWER_PADDING_X_PHYS) {
@@ -144,7 +145,7 @@ void TextViewer::render(const bool focused) const
         SDLSurfaceUniquePtr tmp;
         if (!line.empty()) {
             tmp = SDLSurfaceUniquePtr { SDL_utils::renderText(fonts_, line,
-                Globals::g_colorTextNormal,
+                g_palette.text_body,
                 i == current_line_ ? sdl_highlight_color_ : sdl_bg_color_) };
         }
         const int y = y0 + viewport_line_i * line_height;

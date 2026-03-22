@@ -7,6 +7,7 @@
 
 #include "config.h"
 #include "def.h"
+#include "palette.h"
 #include "resourceManager.h"
 #include "screen.h"
 #include "sdlutils.h"
@@ -128,15 +129,15 @@ void CKeyboard::init()
     y_ = screen.actual_h - (height_ + (8 + FOOTER_H) * screen.ppu_y);
 
     surfaces_ = AllocSurfaces(keyboard_.layout.layers.size(), width_, height_,
-        SDL_MapRGB(screen.surface->format, COLOR_BG_1));
+        toPixel(screen.surface->format, g_palette.bg_normal));
 
     const SDL_PixelFormat *pixel_format = surfaces_[0]->format;
-    border_color_ = SDL_MapRGB(pixel_format, COLOR_BORDER);
-    sdl_bg_color_ = SDL_Color { COLOR_BG_1 };
-    bg_color_ = SDL_MapRGB(pixel_format, COLOR_BG_1);
-    bg2_color_ = SDL_MapRGB(pixel_format, COLOR_BG_2);
-    sdl_highlight_color_ = SDL_Color { COLOR_CURSOR_1 };
-    highlight_color_ = SDL_MapRGB(pixel_format, COLOR_CURSOR_1);
+    border_color_ = toPixel(pixel_format, g_palette.panel);
+    sdl_bg_color_ = g_palette.bg_normal;
+    bg_color_ = toPixel(pixel_format, g_palette.bg_normal);
+    bg2_color_ = toPixel(pixel_format, g_palette.bg_alternate);
+    sdl_highlight_color_ = g_palette.bg_selection;
+    highlight_color_ = toPixel(pixel_format, g_palette.bg_selection);
 
     text_field_rect_.x = frame_padding_x_;
     text_field_rect_.y = frame_padding_y_;
@@ -154,7 +155,7 @@ void CKeyboard::init()
 
     kb_highlighted_surfaces_
         = AllocSurfaces(keyboard_.layout.layers.size(), kb_buttons_rect_.w,
-            kb_buttons_rect_.h, SDL_MapRGB(screen.surface->format, COLOR_BG_1));
+            kb_buttons_rect_.h, toPixel(screen.surface->format, g_palette.bg_normal));
 
     cancel_rect_.x = kb_buttons_rect_.x;
     cancel_rect_.y = kb_buttons_rect_.y + kb_buttons_rect_.h - ok_cancel_height;
@@ -208,10 +209,10 @@ void CKeyboard::init()
 
     footer_.reset(
         SDL_utils::createImage(screen.actual_w, FOOTER_H * screen.ppu_y,
-            SDL_MapRGB(surfaces_[0]->format, COLOR_TITLE_BG)));
+            toPixel(surfaces_[0]->format, g_palette.panel)));
     SDL_utils::applyText(screen.w / 2, 1, footer_.get(), m_fonts,
-        "A-Input B-Cancel START-OK L/R⇧ Y← X␣", Globals::g_colorTextTitle,
-        { COLOR_TITLE_BG }, SDL_utils::T_TEXT_ALIGN_CENTER);
+        "A-Input B-Cancel START-OK L/R⇧ Y← X␣", g_palette.text_header,
+        g_palette.panel, SDL_utils::T_TEXT_ALIGN_CENTER);
 }
 
 void CKeyboard::renderButton(
@@ -235,7 +236,7 @@ void CKeyboard::renderButton(SDL_Surface &out, SDL_Rect rect,
     renderRectWithBorder(&out, rect, 1, border_color, bg_color);
     SDL_utils::applyPpuScaledText(rect.x + rect.w / 2,
         rect.y + keycap_text_offset_y_, &out, m_fonts, text,
-        Globals::g_colorTextNormal, sdl_bg_color,
+        g_palette.text_body, sdl_bg_color,
         SDL_utils::T_TEXT_ALIGN_CENTER);
 }
 
@@ -338,7 +339,7 @@ void CKeyboard::renderKeys(std::vector<SDLSurfaceUniquePtr> &out_surfaces,
                 SDL_utils::applyPpuScaledText(
                     key_rect.x + kb.border_w + kb.key_w / 2,
                     key_rect.y + kb.border_w + keycap_text_offset_y_, out,
-                    m_fonts, key, Globals::g_colorTextNormal, sdl_key_bg_color,
+                    m_fonts, key, g_palette.text_body, sdl_key_bg_color,
                     SDL_utils::T_TEXT_ALIGN_CENTER);
                 key_rect.x += kb.key_w + kb.key_gap * screen.ppu_x
                     - (kb.collapse_borders ? kb.border_w : 0);

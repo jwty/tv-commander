@@ -110,11 +110,6 @@ namespace Globals
 {
     // Screen
     extern SDL_Surface *g_screen;
-    // Colors
-    extern const SDL_Color g_colorTextNormal;
-    extern const SDL_Color g_colorTextTitle;
-    extern const SDL_Color g_colorTextDir;
-    extern const SDL_Color g_colorTextSelected;
     // The list of opened windows
     extern std::vector<CWindow *> g_windows;
 }

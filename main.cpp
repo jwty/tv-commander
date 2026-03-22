@@ -10,15 +10,12 @@
 #include "error_dialog.h"
 #include "commander.h"
 #include "def.h"
+#include "palette.h"
 #include "resourceManager.h"
 #include "screen.h"
 #include "sdlutils.h"
 
 // Globals
-const SDL_Color Globals::g_colorTextNormal = {COLOR_TEXT_NORMAL};
-const SDL_Color Globals::g_colorTextTitle = {COLOR_TEXT_TITLE};
-const SDL_Color Globals::g_colorTextDir = {COLOR_TEXT_DIR};
-const SDL_Color Globals::g_colorTextSelected = {COLOR_TEXT_SELECTED};
 std::vector<CWindow *> Globals::g_windows;
 
 namespace {
@@ -76,6 +73,8 @@ int main(int argc, char *argv[])
     }
     if (!config_prelude_path.empty()) cfg.Load(config_prelude_path);
     if (!config_path.empty()) cfg.Load(config_path);
+
+    g_palette.init(cfg.dark_mode);
 
     // Avoid crash due to the absence of mouse
     char l_s[]="SDL_NOMOUSE=1";

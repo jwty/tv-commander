@@ -5,6 +5,7 @@
 
 #include "def.h"
 #include "fileutils.h"
+#include "palette.h"
 #include "resourceManager.h"
 #include "screen.h"
 #include "sdl_ptrs.h"
@@ -231,7 +232,7 @@ void pleaseWait(void)
 {
     SDLSurfaceUniquePtr text_surface { renderText(
         CResourceManager::instance().getFonts(), "Please wait...",
-        Globals::g_colorTextNormal, { COLOR_BG_2 }) };
+        g_palette.text_body, g_palette.bg_alternate) };
     const int border_x = static_cast<int>(DIALOG_BORDER * screen.ppu_x);
     const int border_y = static_cast<int>(DIALOG_BORDER * screen.ppu_y);
     const int padding_x = static_cast<int>(DIALOG_PADDING * screen.ppu_y);
@@ -240,9 +241,9 @@ void pleaseWait(void)
     const int dialog_h = text_surface->h + 2 * (border_y + padding_y);
     SDL_Rect l_rect = Rect((screen.actual_w - dialog_w) / 2,
         (screen.actual_h - dialog_h) / 2, dialog_w, dialog_h);
-    SDL_FillRect(screen.surface, &l_rect, SDL_MapRGB(screen.surface->format, COLOR_BG_2));
+    SDL_FillRect(screen.surface, &l_rect, toPixel(screen.surface->format, g_palette.bg_alternate));
     renderBorder(screen.surface, l_rect, border_x, border_y,
-        SDL_MapRGB(screen.surface->format, COLOR_BORDER));
+        toPixel(screen.surface->format, g_palette.panel));
     applyPpuScaledSurface(l_rect.x + border_x + padding_x,
         l_rect.y + border_y + padding_y, text_surface.get(), screen.surface);
     screen.flip();

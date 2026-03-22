@@ -2,6 +2,7 @@
 
 #include "config.h"
 #include "def.h"
+#include "palette.h"
 #include "resourceManager.h"
 #include "screen.h"
 #include "sdlutils.h"
@@ -23,7 +24,7 @@ void ImageViewer::init()
     // Create the fullscreen background surface
     background_ = SDLSurfaceUniquePtr{
         SDL_utils::createImage(screen.actual_w,
-            screen.actual_h, SDL_MapRGB(screen.surface->format, COLOR_BG_1))
+            screen.actual_h, toPixel(screen.surface->format, g_palette.bg_normal))
     };
     // Checkerboard background
     constexpr int kTransparentBgRectSize = 10;
@@ -82,11 +83,11 @@ void ImageViewer::render(const bool focused) const
 
         // Draw background rectangle for title
         SDL_Rect rect = SDL_utils::Rect(0, 0, screen.actual_w, HEADER_H * screen.ppu_y);
-        SDL_FillRect(screen.surface, &rect, SDL_MapRGB(screen.surface->format, COLOR_BORDER));
+        SDL_FillRect(screen.surface, &rect, toPixel(screen.surface->format, g_palette.panel));
 
         // Render title text
         SDLSurfaceUniquePtr tmp{
-            SDL_utils::renderText(fonts, filename_, Globals::g_colorTextTitle, { COLOR_TITLE_BG })
+            SDL_utils::renderText(fonts, filename_, g_palette.text_header, g_palette.panel)
         };
 
         SDL_utils::applyPpuScaledSurface(2 * screen.ppu_x, HEADER_PADDING_TOP * screen.ppu_y,

@@ -7,6 +7,7 @@
 #include <SDL.h>
 
 #include "def.h"
+#include "palette.h"
 #include "sdl_ptrs.h"
 
 class TextEdit {
@@ -63,13 +64,13 @@ class TextEdit {
 
     int border_width_x_, border_width_y_, padding_x_, padding_y_;
 
-    SDL_Color sdl_border_color_ = SDL_Color { COLOR_BORDER };
+    SDL_Color sdl_border_color_;
     std::uint32_t border_color_;
 
-    SDL_Color sdl_focus_border_color_ = SDL_Color { COLOR_CURSOR_1 };
+    SDL_Color sdl_focus_border_color_;
     std::uint32_t focus_border_color_;
 
-    SDL_Color sdl_bg_color_ = SDL_Color { COLOR_BG_1 };
+    SDL_Color sdl_bg_color_;
     std::uint32_t bg_color_;
 
     const bool support_tabs_;

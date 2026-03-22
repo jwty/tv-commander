@@ -34,18 +34,5 @@
 // Dialogs
 #define DIALOG_BORDER 2
 #define DIALOG_PADDING 8
-// Colors
-#define COLOR_TITLE_BG 102, 85, 74
-#define COLOR_KEY 255, 0, 255
-#define COLOR_TEXT_NORMAL 70, 27, 10
-#define COLOR_TEXT_TITLE 233, 229, 227
-#define COLOR_TEXT_DIR 75, 70, 164
-#define COLOR_TEXT_SELECTED 255, 0, 0
-#define COLOR_CURSOR_1 232, 152, 80
-#define COLOR_CURSOR_2 232, 201, 173
-#define COLOR_BG_1 255, 255, 255
-#define COLOR_BG_2 232, 228, 224
-#define COLOR_BORDER 102, 85, 74
-#define COLOR_BORDER_ERROR 128, 55, 55
 
 #endif // _DEF_H_

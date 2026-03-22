@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include "palette.h"
 #include "def.h"
 #include "dialog.h"
 
@@ -17,7 +18,7 @@ inline ErrorDialogResult ErrorDialog(
     const std::string &title, const std::string &error, bool is_last = true)
 {
     CDialog dlg{title};
-    dlg.setBorderColor({COLOR_BORDER_ERROR});
+    dlg.setBorderColor(g_palette.highlight);
     dlg.addLabel(error);
     std::vector<ErrorDialogResult> options { ErrorDialogResult::ABORT };
     const auto add_option = [&](std::string text, ErrorDialogResult value) {

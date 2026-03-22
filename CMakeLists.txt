@@ -43,6 +43,7 @@ set(DinguxCommander_SRCS
   fileutils.cpp
   keyboard.cpp
   main.cpp
+  palette.cpp
   panel.cpp
   resourceManager.cpp
   screen.cpp

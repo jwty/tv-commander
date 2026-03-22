@@ -1,5 +1,6 @@
 #include <iostream>
 #include <sstream>
+#include "palette.h"
 #include "panel.h"
 #include "resourceManager.h"
 #include "screen.h"
@@ -71,11 +72,11 @@ void CPanel::render(const bool p_active) const
     const unsigned int l_nbTotal = m_fileLister.getNbTotal();
     int l_y = list_y();
     SDL_Surface *l_surfaceTmp = NULL;
-    const SDL_Color *l_color = NULL;
+    SDL_Color l_color;
     SDL_Rect l_rect;
     // Current dir
     l_surfaceTmp = SDL_utils::renderText(
-        m_fonts, m_currentPath, Globals::g_colorTextTitle, { COLOR_TITLE_BG });
+        m_fonts, m_currentPath, g_palette.text_header, g_palette.panel);
     if (l_surfaceTmp->w > width()) {
         l_rect.x = l_surfaceTmp->w - width();
         l_rect.y = 0;
@@ -110,9 +111,9 @@ void CPanel::render(const bool p_active) const
                 l_surfaceTmp = icon_dir();
             // Color
             if (m_selectList.find(l_i) != m_selectList.end())
-                l_color = &Globals::g_colorTextSelected;
+                l_color = g_palette.highlight;
             else
-                l_color = &Globals::g_colorTextDir;
+                l_color = g_palette.text_body;
         }
         else
         {
@@ -128,23 +129,23 @@ void CPanel::render(const bool p_active) const
             }
             // Color
             if (m_selectList.find(l_i) != m_selectList.end())
-                l_color = &Globals::g_colorTextSelected;
+                l_color = g_palette.highlight;
             else
-                l_color = &Globals::g_colorTextNormal;
+                l_color = g_palette.text_body;
         }
         SDL_utils::applyPpuScaledSurface(m_x, l_y + 2 * screen.ppu_y, l_surfaceTmp, screen.surface);
         // Text
         SDL_Color l_bg;
         if (l_i == m_highlightedLine) {
             if (p_active)
-                l_bg = {COLOR_CURSOR_1};
+                l_bg = g_palette.bg_selection;
             else
-                l_bg = {COLOR_CURSOR_2};
+                l_bg = g_palette.bg_selection_alt;
         } else {
-            static const SDL_Color kLineBg[2] = {{COLOR_BG_1}, {COLOR_BG_2}};
+            static const SDL_Color kLineBg[2] = {g_palette.bg_normal, g_palette.bg_alternate};
             l_bg = kLineBg[(l_i - m_camera) % 2];
         }
-        l_surfaceTmp = SDL_utils::renderText(m_fonts, m_fileLister[l_i].m_name, *l_color, l_bg);
+        l_surfaceTmp = SDL_utils::renderText(m_fonts, m_fileLister[l_i].m_name, l_color, l_bg);
         const int max_name_width = width() - static_cast<int>(18 * screen.ppu_x);
         SDL_Rect *text_clip_rect = nullptr;
         if (l_surfaceTmp->w > max_name_width)
@@ -175,11 +176,11 @@ void CPanel::render(const bool p_active) const
     }
     SDL_utils::applyPpuScaledText(m_x + static_cast<int>(2 * screen.ppu_x),
         footer_y() + footer_padding_top(), screen.surface, m_fonts,
-        "Size:", Globals::g_colorTextTitle, { COLOR_TITLE_BG });
+        "Size:", g_palette.text_header, g_palette.panel);
     SDL_utils::applyPpuScaledText(
         m_x + width() - static_cast<int>(2 * screen.ppu_x),
         footer_y() + footer_padding_top(), screen.surface, m_fonts, l_footer,
-        Globals::g_colorTextTitle, { COLOR_TITLE_BG },
+        g_palette.text_header, g_palette.panel,
         SDL_utils::T_TEXT_ALIGN_RIGHT);
 }
 

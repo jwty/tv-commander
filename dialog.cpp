@@ -2,6 +2,7 @@
 
 #include "config.h"
 #include "dialog.h"
+#include "palette.h"
 #include "screen.h"
 #include "sdlutils.h"
 #include "resourceManager.h"
@@ -10,7 +11,7 @@
 CDialog::CDialog(const std::string &p_title, std::function<Sint16()> x_fn,
         std::function<Sint16()> y_fn):
     CWindow(),
-    m_borderColor({COLOR_BORDER}),
+    m_borderColor(g_palette.panel),
     m_nbTitle(false),
     m_nbLabels(0),
     m_nbOptions(0),
@@ -85,7 +86,7 @@ void CDialog::init(void)
     // Title
     auto l_it = m_lines.begin();
     if (m_nbTitle) {
-        m_titleImg = SDL_utils::renderText(m_fonts, *l_it, Globals::g_colorTextTitle, m_borderColor);
+        m_titleImg = SDL_utils::renderText(m_fonts, *l_it, g_palette.text_header, m_borderColor);
         // m_titleImg is nullptr when text has zero width.
         width_ = m_titleImg != nullptr ? m_titleImg->w : 0;
         ++l_it;
@@ -95,12 +96,12 @@ void CDialog::init(void)
     const std::size_t num_non_title_lines = m_lines.size() - (m_nbTitle ? 1 : 0);
     m_linesImg.reserve(num_non_title_lines);
 
-    SDL_Color label_bg{COLOR_BG_1};
-    if (m_nbOptions > 1) label_bg = SDL_Color{COLOR_BG_2};
-    const SDL_Color option_bg{COLOR_BG_1};
+    SDL_Color label_bg{g_palette.bg_normal};
+    if (m_nbOptions > 1) label_bg = g_palette.bg_alternate;
+    const SDL_Color option_bg{g_palette.bg_normal};
 
     for (int i = 0; i < m_nbLabels; ++i, ++l_it) {
-        m_linesImg.push_back(SDL_utils::renderText(m_fonts, *l_it, Globals::g_colorTextNormal, label_bg));
+        m_linesImg.push_back(SDL_utils::renderText(m_fonts, *l_it, g_palette.text_body, label_bg));
         if (m_linesImg.back() != nullptr && m_linesImg.back()->w > width_)
             width_ = m_linesImg.back()->w;
     }
@@ -108,9 +109,9 @@ void CDialog::init(void)
     m_linesImgCursor1.reserve(m_nbOptions);
     m_linesImgCursor2.reserve(m_nbOptions);
     for (int i = 0; i < m_nbOptions; ++i, ++l_it) {
-        m_linesImg.push_back(SDL_utils::renderText(m_fonts, *l_it, Globals::g_colorTextNormal, option_bg));
-        m_linesImgCursor1.push_back(SDL_utils::renderText(m_fonts, *l_it, Globals::g_colorTextNormal, {COLOR_CURSOR_1}));
-        m_linesImgCursor2.push_back(SDL_utils::renderText(m_fonts, *l_it, Globals::g_colorTextNormal, {COLOR_CURSOR_2}));
+        m_linesImg.push_back(SDL_utils::renderText(m_fonts, *l_it, g_palette.text_body, option_bg));
+        m_linesImgCursor1.push_back(SDL_utils::renderText(m_fonts, *l_it, g_palette.text_body, g_palette.bg_selection));
+        m_linesImgCursor2.push_back(SDL_utils::renderText(m_fonts, *l_it, g_palette.text_body, g_palette.bg_selection_alt));
         if (m_linesImg.back() != nullptr && m_linesImg.back()->w > width_)
             width_ = m_linesImg.back()->w;
     }
@@ -147,11 +148,11 @@ void CDialog::init(void)
         SDL_Rect rect = SDL_utils::makeRect(border_x_,
             border_y_ + ((m_nbTitle ? 1 : 0) + m_nbLabels) * line_height_,
             m_image->w - 2 * border_x_, m_nbOptions * line_height_);
-        SDL_FillRect(m_image, &rect, SDL_MapRGB(m_image->format, COLOR_BG_1));
+        SDL_FillRect(m_image, &rect, toPixel(m_image->format, g_palette.bg_normal));
     }
     // Create cursor image
-    m_cursor1 = SDL_utils::createImage(cursor_width, line_height_, SDL_MapRGB(screen.surface->format, COLOR_CURSOR_1));
-    m_cursor2 = SDL_utils::createImage(cursor_width, line_height_, SDL_MapRGB(screen.surface->format, COLOR_CURSOR_2));
+    m_cursor1 = SDL_utils::createImage(cursor_width, line_height_, toPixel(screen.surface->format, g_palette.bg_selection));
+    m_cursor2 = SDL_utils::createImage(cursor_width, line_height_, toPixel(screen.surface->format, g_palette.bg_selection_alt));
 
     // Adjust dialog coordinates
     m_x = m_x_fn ? m_x_fn() : (screen.actual_w - m_image->w) / 2;

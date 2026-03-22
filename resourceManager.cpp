@@ -6,6 +6,7 @@
 #include "config.h"
 #include "def.h"
 #include "icons.h"
+#include "palette.h"
 #include "resourceManager.h"
 #include "screen.h"
 #include "sdlutils.h"
@@ -141,22 +142,25 @@ CResourceManager::CResourceManager()
 void CResourceManager::onResize()
 {
     if (screen.ppu_x != m_ppu_x || screen.ppu_y != m_ppu_y) {
-        std::string iconColor = config().icon_color;
-        m_surfaces[T_SURFACE_FOLDER] = LoadSvgIcon(Icons::ICON_FOLDER, iconColor);
-        m_surfaces[T_SURFACE_FOLDER_SYMLINK] = LoadSvgIcon(Icons::ICON_FOLDER_SYMLINK, iconColor);
-        m_surfaces[T_SURFACE_FILE] = LoadSvgIcon(Icons::ICON_FILE_GENERIC, iconColor);
-        m_surfaces[T_SURFACE_FILE_SYMLINK] = LoadSvgIcon(Icons::ICON_FILE_SYMLINK, iconColor);
-        m_surfaces[T_SURFACE_FILE_IMAGE] = LoadSvgIcon(Icons::ICON_FILE_IMAGE, iconColor);
-        m_surfaces[T_SURFACE_UP] = LoadSvgIcon(Icons::ICON_UP, iconColor);
+        auto iconColor = [](const RGB& p) -> std::string {
+            return "rgb(" + std::to_string(p.r) + "," + std::to_string(p.g) + "," + std::to_string(p.b) + ")";
+        };
+
+        m_surfaces[T_SURFACE_FOLDER] = LoadSvgIcon(Icons::ICON_FOLDER, iconColor(g_palette.icon_dir));
+        m_surfaces[T_SURFACE_FOLDER_SYMLINK] = LoadSvgIcon(Icons::ICON_FOLDER_SYMLINK, iconColor(g_palette.icon_dir));
+        m_surfaces[T_SURFACE_FILE] = LoadSvgIcon(Icons::ICON_FILE_GENERIC, iconColor(g_palette.icon_file));
+        m_surfaces[T_SURFACE_FILE_SYMLINK] = LoadSvgIcon(Icons::ICON_FILE_SYMLINK, iconColor(g_palette.icon_file));
+        m_surfaces[T_SURFACE_FILE_IMAGE] = LoadSvgIcon(Icons::ICON_FILE_IMAGE, iconColor(g_palette.icon_file));
+        m_surfaces[T_SURFACE_UP] = LoadSvgIcon(Icons::ICON_UP, iconColor(g_palette.icon_dir));
     }
 
     m_surfaces[T_SURFACE_CURSOR1] = SDLSurfaceUniquePtr {
         SDL_utils::createImage(screen.actual_w / 2, LINE_HEIGHT_PHYS,
-            SDL_MapRGB(screen.surface->format, COLOR_CURSOR_1))
+            toPixel(screen.surface->format, g_palette.bg_selection))
     };
     m_surfaces[T_SURFACE_CURSOR2] = SDLSurfaceUniquePtr {
         SDL_utils::createImage(screen.actual_w / 2, LINE_HEIGHT_PHYS,
-            SDL_MapRGB(screen.surface->format, COLOR_CURSOR_2))
+            toPixel(screen.surface->format, g_palette.bg_selection_alt))
     };
 
     if (screen.ppu_x != m_ppu_x || screen.ppu_y != m_ppu_y) {

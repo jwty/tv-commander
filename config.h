@@ -31,8 +31,8 @@ struct Config {
     std::string font_primary = "monospace";
     std::string font_fallback;
 
-    // Icon color (any valid SVG color value)
-    std::string icon_color = "#000000";
+    // Dark mode (inverts color palette)
+    bool dark_mode = false;
 
     // Keyboard key code mappings
     SDLC_Keycode key_down = CMDR_KEY_DOWN;

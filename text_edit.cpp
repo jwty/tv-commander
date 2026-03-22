@@ -3,6 +3,7 @@
 #include <cmath>
 #include <cstdio>
 
+#include "palette.h"
 #include "resourceManager.h"
 #include "screen.h"
 #include "sdlutils.h"
@@ -32,6 +33,10 @@ void TextEdit::setDimensions(int width, int height)
     foreground_rect_.y = border_width_y_;
     foreground_rect_.w = width_ - 2 * border_width_x_;
     foreground_rect_.h = height_ - 2 * border_width_y_;
+
+    sdl_border_color_ = g_palette.panel;
+    sdl_focus_border_color_ = g_palette.bg_selection;
+    sdl_bg_color_ = g_palette.bg_normal;
 
     prepareSurfaces();
     prepareColors();
@@ -86,7 +91,7 @@ void TextEdit::updateForeground() const
 
     const auto &fonts = CResourceManager::instance().getFonts();
     SDLSurfaceUniquePtr tmp_surface { SDL_utils::renderText(fonts,
-        text_for_render(text_), Globals::g_colorTextNormal, { COLOR_BG_1 }) };
+        text_for_render(text_), g_palette.text_body, g_palette.bg_normal) };
     const int cursor_x = cursor_pos_ == text_.size()
         ? tmp_surface->w
         : SDL_utils::measureText(

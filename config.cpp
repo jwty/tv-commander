@@ -189,11 +189,10 @@ void Config::Load(const std::string &path)
 
     CFG_INT(disp_width)
     CFG_INT(disp_height)
-    CFG_INT(disp_bpp)
     CFG_FLOAT(disp_ppu_x)
     CFG_FLOAT(disp_ppu_y)
     CFG_BOOL(disp_autoscale)
-    CFG_BOOL(disp_autoscale_dpi)
+    CFG_BOOL(disp_windowed)
 
     CFG_STR(path_default)
     processEnvValue(&path_default);

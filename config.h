@@ -12,11 +12,10 @@ struct Config {
     // Display settings
     int disp_width = SCREEN_WIDTH;
     int disp_height = SCREEN_HEIGHT;
-    int disp_bpp = SCREEN_BPP;
     float disp_ppu_x = PPU_X;
     float disp_ppu_y = PPU_Y;
     bool disp_autoscale = static_cast<bool>(AUTOSCALE);
-    bool disp_autoscale_dpi = static_cast<bool>(AUTOSCALE_DPI);
+    bool disp_windowed = false;
 
     // Default paths to the left and right panels
     std::string path_default = PATH_DEFAULT;

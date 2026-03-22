@@ -16,10 +16,6 @@
 #define SCREEN_HEIGHT 240
 #endif
 
-#ifndef SCREEN_BPP
-#define SCREEN_BPP 16
-#endif
-
 #ifndef PPU_Y
 #define PPU_Y 1
 #endif
@@ -30,8 +26,9 @@
 #ifndef AUTOSCALE
 #define AUTOSCALE 1
 #endif
-#ifndef AUTOSCALE_DPI
-#define AUTOSCALE_DPI 1
+
+#ifndef WINDOWED
+#define WINDOWED 0
 #endif
 
 #ifndef PATH_DEFAULT

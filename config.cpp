@@ -203,11 +203,11 @@ void Config::Load(const std::string &path)
     processEnvValue(&path_default_right_fallback);
     CFG_STR(file_system)
     processEnvValue(&file_system);
-    CFG_STR(res_dir)
-    processEnvValue(&res_dir);
 
     CFG_STR(font_primary)
     CFG_STR(font_fallback)
+
+    CFG_STR(icon_color)
 
     CFG_BOOL(osk_key_system_is_backspace)
 

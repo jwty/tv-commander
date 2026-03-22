@@ -19,11 +19,10 @@ class CResourceManager
     typedef enum
     {
         T_SURFACE_FOLDER = 0,
+        T_SURFACE_FOLDER_SYMLINK,
         T_SURFACE_FILE,
+        T_SURFACE_FILE_SYMLINK,
         T_SURFACE_FILE_IMAGE,
-        T_SURFACE_FILE_INSTALLABLE_PACKAGE,
-        T_SURFACE_FILE_PACKAGE,
-        T_SURFACE_FILE_IS_SYMLINK,
         T_SURFACE_UP,
         T_SURFACE_CURSOR1,
         T_SURFACE_CURSOR2

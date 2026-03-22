@@ -30,90 +30,39 @@ CPanel::CPanel(const std::string &p_path, const Sint16 p_x):
 
 CPanel::~CPanel(void) { }
 
-SDL_Surface *CPanel::icon_dir() const
-{
-    return resources_.getSurface(CResourceManager::T_SURFACE_FOLDER);
-}
+SDL_Surface *CPanel::icon_dir() const { return resources_.getSurface(CResourceManager::T_SURFACE_FOLDER); }
 
-SDL_Surface *CPanel::icon_file() const
-{
-    return resources_.getSurface(CResourceManager::T_SURFACE_FILE);
-}
+SDL_Surface *CPanel::icon_file() const { return resources_.getSurface(CResourceManager::T_SURFACE_FILE); }
 
-SDL_Surface *CPanel::icon_img() const
-{
-    return resources_.getSurface(CResourceManager::T_SURFACE_FILE_IMAGE);
-}
+SDL_Surface *CPanel::icon_img() const { return resources_.getSurface(CResourceManager::T_SURFACE_FILE_IMAGE); }
 
-SDL_Surface *CPanel::icon_ipk() const
-{
-    return resources_.getSurface(
-        CResourceManager::T_SURFACE_FILE_INSTALLABLE_PACKAGE);
-}
+SDL_Surface *CPanel::icon_folder_symlink() const { return resources_.getSurface(CResourceManager::T_SURFACE_FOLDER_SYMLINK); }
 
-SDL_Surface *CPanel::icon_opk() const
-{
-    return resources_.getSurface(CResourceManager::T_SURFACE_FILE_PACKAGE);
-}
+SDL_Surface *CPanel::icon_file_symlink() const { return resources_.getSurface(CResourceManager::T_SURFACE_FILE_SYMLINK); }
 
-SDL_Surface *CPanel::icon_symlink() const
-{
-    return resources_.getSurface(CResourceManager::T_SURFACE_FILE_IS_SYMLINK);
-}
+SDL_Surface *CPanel::icon_up() const { return resources_.getSurface(CResourceManager::T_SURFACE_UP); }
 
-SDL_Surface *CPanel::icon_up() const
-{
-    return resources_.getSurface(CResourceManager::T_SURFACE_UP);
-}
+SDL_Surface *CPanel::cursor1() const { return resources_.getSurface(CResourceManager::T_SURFACE_CURSOR1); }
 
-SDL_Surface *CPanel::cursor1() const
-{
-    return resources_.getSurface(CResourceManager::T_SURFACE_CURSOR1);
-}
-
-SDL_Surface *CPanel::cursor2() const
-{
-    return resources_.getSurface(CResourceManager::T_SURFACE_CURSOR2);
-}
+SDL_Surface *CPanel::cursor2() const { return resources_.getSurface(CResourceManager::T_SURFACE_CURSOR2); }
 
 int CPanel::list_y() const { return Y_LIST_PHYS; }
 
-int CPanel::line_height() const
-{
-    return LINE_HEIGHT_PHYS;
-}
+int CPanel::line_height() const { return LINE_HEIGHT_PHYS; }
 
-int CPanel::header_height() const
-{
-    return HEADER_H_PHYS;
-}
+int CPanel::header_height() const { return HEADER_H_PHYS; }
 
-int CPanel::header_padding_top() const
-{
-    return HEADER_PADDING_TOP_PHYS;
-}
+int CPanel::header_padding_top() const { return HEADER_PADDING_TOP_PHYS; }
 
-int CPanel::footer_height() const
-{
-    return FOOTER_H_PHYS;
-}
+int CPanel::footer_height() const { return FOOTER_H_PHYS; }
 
 int CPanel::footer_y() const { return screen.actual_h - footer_height(); }
 
-int CPanel::footer_padding_top() const
-{
-    return FOOTER_PADDING_TOP_PHYS;
-}
+int CPanel::footer_padding_top() const { return FOOTER_PADDING_TOP_PHYS; }
 
-int CPanel::width() const
-{
-    return (screen.actual_w - static_cast<int>(2 * screen.ppu_x)) / 2;
-}
+int CPanel::width() const { return (screen.actual_w - static_cast<int>(2 * screen.ppu_x)) / 2; }
 
-int CPanel::list_height() const
-{
-    return screen.actual_h - header_height() - footer_height();
-}
+int CPanel::list_height() const { return screen.actual_h - header_height() - footer_height(); }
 
 void CPanel::render(const bool p_active) const
 {
@@ -148,13 +97,15 @@ void CPanel::render(const bool p_active) const
         list_y() + (m_highlightedLine - m_camera) * line_height(),
         p_active ? cursor1() : cursor2(), screen.surface);
     for (unsigned int l_i = m_camera;
-         l_i < m_camera + NB_VISIBLE_LINES && l_i < l_nbTotal; ++l_i) {
+        l_i < m_camera + NB_VISIBLE_LINES && l_i < l_nbTotal; ++l_i) {
         // Icon and color
         if (m_fileLister.isDirectory(l_i))
         {
             // Icon
             if (m_fileLister[l_i].m_name == "..")
                 l_surfaceTmp = icon_up();
+            else if (m_fileLister[l_i].is_symlink)
+                l_surfaceTmp = icon_folder_symlink();
             else
                 l_surfaceTmp = icon_dir();
             // Color
@@ -166,24 +117,22 @@ void CPanel::render(const bool p_active) const
         else
         {
             // Icon
-            const std::string &ext = m_fileLister[l_i].m_ext;
-            if (SDL_utils::isSupportedImageExt(ext))
-                l_surfaceTmp = icon_img();
-            else if (ext == "ipk")
-                l_surfaceTmp = icon_ipk();
-            else if (ext == "opk")
-                l_surfaceTmp = icon_opk();
-            else
-                l_surfaceTmp = icon_file();
+            if (m_fileLister[l_i].is_symlink)
+                l_surfaceTmp = icon_file_symlink();
+            else {
+                const std::string &ext = m_fileLister[l_i].m_ext;
+                if (SDL_utils::isSupportedImageExt(ext))
+                    l_surfaceTmp = icon_img();
+                else
+                    l_surfaceTmp = icon_file();
+            }
             // Color
             if (m_selectList.find(l_i) != m_selectList.end())
                 l_color = &Globals::g_colorTextSelected;
             else
                 l_color = &Globals::g_colorTextNormal;
         }
-        SDL_utils::applyPpuScaledSurface(m_x, l_y, l_surfaceTmp, screen.surface);
-        if (m_fileLister[l_i].is_symlink)
-            SDL_utils::applyPpuScaledSurface(m_x, l_y, icon_symlink(), screen.surface);
+        SDL_utils::applyPpuScaledSurface(m_x, l_y + 2 * screen.ppu_y, l_surfaceTmp, screen.surface);
         // Text
         SDL_Color l_bg;
         if (l_i == m_highlightedLine) {

@@ -1,32 +1,54 @@
 #include <iostream>
 
 #include <fontconfig/fontconfig.h>
+#include <lunasvg.h>
 
 #include "config.h"
 #include "def.h"
+#include "icons.h"
 #include "resourceManager.h"
 #include "screen.h"
 #include "sdlutils.h"
 #include <SDL2_rotozoom.h>
-#include <SDL_image.h>
 
 namespace {
 
-SDLSurfaceUniquePtr LoadIcon(const std::string &path) {
-    SDL_Surface *img = IMG_Load(path.c_str());
-    if(img == nullptr)
-    {
-        std::cerr << "LoadIcon(\"" << path << "\"): " << IMG_GetError() << std::endl;
+std::string replaceCurrentColor(const std::string &svg, const std::string &color) {
+    std::string result = svg;
+    std::string search = "currentColor";
+    size_t pos = 0;
+    while ((pos = result.find(search, pos)) != std::string::npos) {
+        result.replace(pos, search.length(), color);
+        pos += color.length();
+    }
+    return result;
+}
+
+SDLSurfaceUniquePtr LoadSvgIcon(const char *svg_data, const std::string &color) {
+    std::string modified_svg = replaceCurrentColor(svg_data, color);
+    auto document = lunasvg::Document::loadFromData(modified_svg);
+    if (!document) {
+        std::cerr << "LoadSvgIcon: failed to parse SVG" << std::endl;
         return nullptr;
     }
-    SDLSurfaceUniquePtr scaled;
-    if ((screen.ppu_x == 1 || screen.ppu_x == 2) && (screen.ppu_y == 1 || screen.ppu_y == 2)) {
-        scaled = SDLSurfaceUniquePtr { shrinkSurface(img, 2 / screen.ppu_x, 2 / screen.ppu_y) };
-    } else {
-        scaled = SDLSurfaceUniquePtr { zoomSurface(img, screen.ppu_x / 2, screen.ppu_y / 2, SMOOTHING_ON) };
+
+    int w = 24 * screen.ppu_x / 2;
+    int h = 24 * screen.ppu_y / 2;
+    auto bitmap = document->renderToBitmap(w, h);
+    if (bitmap.isNull()) {
+        std::cerr << "LoadSvgIcon: failed to render SVG" << std::endl;
+        return nullptr;
     }
-    SDL_FreeSurface(img);
-    return scaled;
+
+    bitmap.convertToRGBA();
+    SDL_Surface *surf = SDL_CreateRGBSurface(0, w, h, 32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
+    if (!surf) {
+        std::cerr << "LoadSvgIcon: SDL_CreateRGBSurface failed" << std::endl;
+        return nullptr;
+    }
+
+    SDL_memcpy(surf->pixels, bitmap.data(), w * h * 4);
+    return SDLSurfaceUniquePtr { surf };
 }
 
 std::string ResDir = RES_DIR "";
@@ -119,15 +141,13 @@ CResourceManager::CResourceManager()
 void CResourceManager::onResize()
 {
     if (screen.ppu_x != m_ppu_x || screen.ppu_y != m_ppu_y) {
-        m_surfaces[T_SURFACE_FOLDER] = LoadIcon(ResPath("folder.png"));
-        m_surfaces[T_SURFACE_FILE] = LoadIcon(ResPath("file-text.png"));
-        m_surfaces[T_SURFACE_FILE_IMAGE] = LoadIcon(ResPath("file-image.png"));
-        m_surfaces[T_SURFACE_FILE_INSTALLABLE_PACKAGE]
-            = LoadIcon(ResPath("file-ipk.png"));
-        m_surfaces[T_SURFACE_FILE_PACKAGE] = LoadIcon(ResPath("file-opk.png"));
-        m_surfaces[T_SURFACE_FILE_IS_SYMLINK]
-            = LoadIcon(ResPath("file-is-symlink.png"));
-        m_surfaces[T_SURFACE_UP] = LoadIcon(ResPath("up.png"));
+        std::string iconColor = config().icon_color;
+        m_surfaces[T_SURFACE_FOLDER] = LoadSvgIcon(Icons::ICON_FOLDER, iconColor);
+        m_surfaces[T_SURFACE_FOLDER_SYMLINK] = LoadSvgIcon(Icons::ICON_FOLDER_SYMLINK, iconColor);
+        m_surfaces[T_SURFACE_FILE] = LoadSvgIcon(Icons::ICON_FILE_GENERIC, iconColor);
+        m_surfaces[T_SURFACE_FILE_SYMLINK] = LoadSvgIcon(Icons::ICON_FILE_SYMLINK, iconColor);
+        m_surfaces[T_SURFACE_FILE_IMAGE] = LoadSvgIcon(Icons::ICON_FILE_IMAGE, iconColor);
+        m_surfaces[T_SURFACE_UP] = LoadSvgIcon(Icons::ICON_UP, iconColor);
     }
 
     m_surfaces[T_SURFACE_CURSOR1] = SDLSurfaceUniquePtr {

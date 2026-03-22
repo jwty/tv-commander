@@ -13,7 +13,7 @@
 
 class CPanel
 {
-    public:
+  public:
 
     // Constructor
     CPanel(const std::string &p_path, const Sint16 p_x);
@@ -70,7 +70,7 @@ class CPanel
 
     void setX(int x) { m_x = x; }
 
-    private:
+  private:
 
     // Forbidden
     CPanel(void);
@@ -87,9 +87,8 @@ class CPanel
     SDL_Surface *icon_dir() const;
     SDL_Surface *icon_file() const;
     SDL_Surface *icon_img() const;
-    SDL_Surface *icon_ipk() const;
-    SDL_Surface *icon_opk() const;
-    SDL_Surface *icon_symlink() const;
+    SDL_Surface *icon_folder_symlink() const;
+    SDL_Surface *icon_file_symlink() const;
     SDL_Surface *icon_up() const;
     SDL_Surface *cursor1() const;
     SDL_Surface *cursor2() const;

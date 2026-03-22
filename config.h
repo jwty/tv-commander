@@ -28,12 +28,12 @@ struct Config {
     // Default filesystem for Disk info
     std::string file_system = FILE_SYSTEM;
 
-    // Resources directory (e.g. icons).
-    std::string res_dir { RES_DIR };
-
     // Font configuration
     std::string font_primary = "monospace";
     std::string font_fallback;
+
+    // Icon color (any valid SVG color value)
+    std::string icon_color = "#000000";
 
     // Keyboard key code mappings
     SDLC_Keycode key_down = CMDR_KEY_DOWN;

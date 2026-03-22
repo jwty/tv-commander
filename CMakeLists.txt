@@ -6,6 +6,15 @@ project(DinguxCommander
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+include(FetchContent)
+FetchContent_Declare(
+  lunasvg
+  GIT_REPOSITORY https://github.com/sammycage/lunasvg
+  GIT_TAG master
+)
+set(LUNASVG_BUILD_EXAMPLES OFF)
+FetchContent_MakeAvailable(lunasvg)
+
 option(ASAN "Enable address sanitizer" ON)
 option(UBSAN "Enable undefined behaviour sanitizer" ON)
 
@@ -62,6 +71,7 @@ target_link_libraries(${BIN_TARGET} PRIVATE
   PkgConfig::SDL2_ttf
   PkgConfig::SDL2_gfx
   PkgConfig::fontconfig
+  lunasvg
   m
 )
 
@@ -83,7 +93,3 @@ endif()
 install(
   TARGETS ${BIN_TARGET}
   RUNTIME DESTINATION bin)
-install(
-  DIRECTORY "${PROJECT_SOURCE_DIR}/res"
-  DESTINATION share/commander
-  FILES_MATCHING PATTERN "*.png")

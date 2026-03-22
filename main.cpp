@@ -29,11 +29,10 @@ bool fileExists(const std::string &path)
 }
 
 constexpr char kUsage[] =
-    R"(commander [--config <path>] [--config-prelude <path>] [--res-dir <path>]
+    R"(commander [--config <path>] [--config-prelude <path>]
 
     --config <path>             Config file path. Default: ~/.config/commander.cfg.
     --config-prelude <path>     If provided, this config is loaded before the main config.
-    --res-dir <path>            Resource directory. Overrides the configured one.
 )";
 
 } // namespace
@@ -42,7 +41,6 @@ int main(int argc, char *argv[])
 {
     std::string config_prelude_path;
     std::string config_path;
-    std::string res_dir;
     std::string exec_error;
     for (int i = 1; i < argc; i++) {
         if (std::strcmp(argv[i], "--help") == 0) {
@@ -61,12 +59,6 @@ int main(int argc, char *argv[])
                 return 1;
             }
             config_prelude_path = argv[++i];
-        } else if (std::strcmp(argv[i], "--res-dir") == 0) {
-            if (i == argc - 1) {
-                std::cerr << "--res-dir requires an argument\n";
-                return 1;
-            }
-            res_dir = argv[++i];
         } else if (std::strcmp(argv[i], "--show_exec_error") == 0) {
             if (i == argc - 1) {
                 std::cerr << "--show_exec_error requires an argument\n";
@@ -84,9 +76,6 @@ int main(int argc, char *argv[])
     }
     if (!config_prelude_path.empty()) cfg.Load(config_prelude_path);
     if (!config_path.empty()) cfg.Load(config_path);
-    if (!res_dir.empty()) cfg.res_dir = res_dir;
-
-    CResourceManager::SetResDir(cfg.res_dir.c_str());
 
     // Avoid crash due to the absence of mouse
     char l_s[]="SDL_NOMOUSE=1";

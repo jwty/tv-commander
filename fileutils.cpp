@@ -487,15 +487,17 @@ void File_utils::diskInfo(void)
 
 void File_utils::diskUsed(const std::vector<std::string> &p_files)
 {
-    std::string l_line("");
     // Waiting message
     SDL_utils::pleaseWait();
     // Build and execute command
+
+    std::string l_disk_used;
+    unsigned long long l_total_size = 0;
+
     {
         std::string l_command("du -csh");
-        for (std::vector<std::string>::const_iterator l_it = p_files.begin();
-             l_it != p_files.end(); ++l_it)
-            l_command = l_command + " \"" + *l_it + "\"";
+        for (const auto &p : p_files)
+            l_command += " \"" + p + "\"";
         char l_buffer[256];
         FILE *l_pipe = popen(l_command.c_str(), "r");
         if (l_pipe == NULL)
@@ -504,24 +506,36 @@ void File_utils::diskUsed(const std::vector<std::string> &p_files)
             return;
         }
         while (fgets(l_buffer, sizeof(l_buffer), l_pipe) != NULL) { }
-        l_line = l_buffer;
+        l_disk_used = l_buffer;
         pclose(l_pipe);
     }
     // Separate line by spaces
     {
-        std::istringstream l_iss(l_line);
+        std::istringstream l_iss(l_disk_used);
         std::vector<std::string> l_tokens;
         std::copy(std::istream_iterator<std::string>(l_iss),
             std::istream_iterator<std::string>(),
             std::back_inserter<std::vector<std::string>>(l_tokens));
-        l_line = l_tokens[0];
+        l_disk_used = l_tokens[0];
+    }
+
+    for (const auto &p : p_files)
+    {
+        struct ::stat l_stat;
+        if (::stat(p.c_str(), &l_stat) == 0)
+            l_total_size += l_stat.st_size;
     }
     // Dialog
     std::ostringstream l_stream;
     CDialog l_dialog{"Disk used:"};
     l_stream << p_files.size() << " items selected";
     l_dialog.addLabel(l_stream.str());
-    l_dialog.addLabel("Disk used: " + l_line);
+    l_stream.str("");
+    l_stream << l_total_size;
+    std::string l_size_str = l_stream.str();
+    formatSize(l_size_str);
+    l_dialog.addLabel("Size: " + l_size_str);
+    l_dialog.addLabel("Disk used: " + l_disk_used);
     l_dialog.addOption("OK");
     l_dialog.init();
     l_dialog.execute();

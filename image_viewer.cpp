@@ -7,6 +7,7 @@
 #include "sdlutils.h"
 #include "text_viewer.h"
 
+#include <SDL_image.h>
 #include <algorithm>
 #include <sys/stat.h>
 
@@ -93,21 +94,14 @@ void ImageViewer::render(const bool focused) const
     }
 }
 
-// --- Helper: check if a file is an image with supported extension ---
+// --- Helper: check if a file can be loaded as an image ---
 static bool isSupportedImageFile(const std::string& filename) {
-    static const std::vector<std::string> exts = {".png", ".jpg", ".jpeg", ".bmp", ".gif"};
-    std::string lower = filename;
-
-    // Convert to lowercase
-    std::transform(lower.begin(), lower.end(), lower.begin(),
-                   [](unsigned char c){ return std::tolower(c); });
-
-    for (const auto& ext : exts) {
-        if (lower.size() >= ext.size() &&
-            lower.compare(lower.size() - ext.size(), ext.size(), ext) == 0) {
-            return true;
-        }
+    SDL_Surface *test = IMG_Load(filename.c_str());
+    if (test) {
+        SDL_FreeSurface(test);
+        return true;
     }
+    SDL_ClearError();
     return false;
 }
 

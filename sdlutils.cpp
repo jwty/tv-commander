@@ -19,7 +19,11 @@ void setMouseCursorEnabled(bool enabled) {
 }
 
 bool isSupportedImageExt(const std::string &ext) {
-    return ext == "jpg" || ext == "jpeg" || ext == "png" || ext == "ico" || ext == "bmp" || ext == "xcf";
+    return ext == "bmp" || ext == "gif" || ext == "jpg" || ext == "jpeg"
+        || ext == "lbm" || ext == "pcx" || ext == "png" || ext == "ppm"
+        || ext == "pgm" || ext == "pbm" || ext == "pnm" || ext == "qoi"
+        || ext == "tga" || ext == "tiff" || ext == "tif" || ext == "webp"
+        || ext == "xcf" || ext == "xpm";
 }
 
 SDLSurfaceUniquePtr loadImageToFit(

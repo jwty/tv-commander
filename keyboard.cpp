@@ -409,7 +409,7 @@ bool CKeyboard::keyPress(
     if (key == c.key_right || button == c.gamepad_right)
         return isFocusOnTextEdit() ? text_edit_.moveCursorNext()
                                    : moveCursorRight(true);
-    if (key == c.key_operation || button == c.gamepad_operation) { // X => Space
+    if (button == c.gamepad_operation) { // X button on gamepad => Space
         text_edit_.typeText(' ');
         return true;
     }

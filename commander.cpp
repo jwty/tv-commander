@@ -397,6 +397,7 @@ const bool CCommander::openSystemMenu(void)
         l_dialog.addOption("Select none");
         l_dialog.addOption("New directory");
         l_dialog.addOption("New file");
+        l_dialog.addOption("Refresh panel");
         l_dialog.addOption("Disk info");
         l_dialog.addOption("Quit");
         l_dialog.init();
@@ -437,10 +438,15 @@ const bool CCommander::openSystemMenu(void)
             }
             break;
         case 5:
+            // Refresh panel
+            m_panelSource->refresh();
+            l_ret = true;
+            break;
+        case 6:
             // Disk info
             File_utils::diskInfo();
             break;
-        case 6:
+        case 7:
             // Quit
             m_retVal = -1;
             break;

@@ -57,6 +57,9 @@ namespace SDL_utils
     // Get text dimensions (expensive).
     std::pair<int, int> measureText(const Fonts &fonts, const std::string &text);
 
+    // Truncate text to fit width, inserting ellipsis in the middle
+    std::string truncateMiddle(const std::string &text, int max_width, const Fonts &fonts, const std::string &ellipsis = "...");
+
     // Equivalent to SDL_Rect { ... } but avoids -Wnarrowing.
     inline SDL_Rect makeRect(int x, int y, int w, int h)
     {

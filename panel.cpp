@@ -149,10 +149,11 @@ void CPanel::render(const bool p_active) const
             static const SDL_Color kLineBg[2] = {g_palette.bg_normal, g_palette.bg_alternate};
             l_bg = kLineBg[(l_i - m_camera) % 2];
         }
-        l_surfaceTmp = SDL_utils::renderText(m_fonts, m_fileLister[l_i].m_name, l_color, l_bg);
         const int max_name_width = width() - static_cast<int>(18 * screen.ppu_x);
+        std::string displayName = SDL_utils::truncateMiddle(m_fileLister[l_i].m_name, max_name_width, m_fonts);
+        l_surfaceTmp = SDL_utils::renderText(m_fonts, displayName, l_color, l_bg);
         SDL_Rect *text_clip_rect = nullptr;
-        if (l_surfaceTmp->w > max_name_width)
+        if (l_surfaceTmp != nullptr && l_surfaceTmp->w > max_name_width)
         {
             l_rect.x = 0;
             l_rect.y = 0;

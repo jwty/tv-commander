@@ -116,6 +116,78 @@ std::pair<int, int> measureText(const Fonts &fonts, const std::string &text) {
     return {surface->w, surface->h};
 }
 
+std::string truncateMiddle(const std::string &text, int max_width, const Fonts &fonts, const std::string &ellipsis) {
+    if (text.empty()) return text;
+
+    auto full_size = measureText(fonts, text);
+    if (full_size.first <= max_width) return text;
+
+    auto ellipsis_size = measureText(fonts, ellipsis);
+    if (ellipsis_size.first >= max_width) {
+        max_width = full_size.first;
+    }
+
+    int remaining_width = max_width - ellipsis_size.first;
+    if (remaining_width <= 0) return text;
+
+    auto getSubstrSize = [&](const std::string &substr) -> int {
+        return measureText(fonts, substr).first;
+    };
+
+    int target_part_width = remaining_width / 2;
+    size_t text_len = text.size();
+
+    // Max chars from start that fit in target_part_width
+    size_t start_chars = 0, lo = 0, hi = text_len;
+    while (lo < hi) {
+        size_t mid = (lo + hi + 1) / 2;
+        if (getSubstrSize(text.substr(0, mid)) <= target_part_width)
+            lo = mid;
+        else
+            hi = mid - 1;
+    }
+    start_chars = lo;
+
+    // Max chars from end that fit in target_part_width
+    size_t end_chars = 0; lo = 0; hi = text_len;
+    while (lo < hi) {
+        size_t mid = (lo + hi + 1) / 2;
+        if (getSubstrSize(text.substr(text_len - mid)) <= target_part_width)
+            lo = mid;
+        else
+            hi = mid - 1;
+    }
+    end_chars = lo;
+
+    // Try combining and adjust if necessary
+    while (start_chars > 0 && end_chars > 0) {
+        std::string start_part = text.substr(0, start_chars);
+        std::string end_part = text.substr(text_len - end_chars);
+
+        int combined = getSubstrSize(start_part) + getSubstrSize(end_part);
+        if (combined <= remaining_width) return start_part + ellipsis + end_part;
+
+        if (start_chars > end_chars)
+            --start_chars;
+        else
+            --end_chars;
+    }
+
+    // Fallback for prefix that fits max_width
+    size_t prefix_len = 0; lo = 0; hi = text_len;
+    while (lo < hi) {
+        size_t mid = (lo + hi + 1) / 2;
+        if (getSubstrSize(text.substr(0, mid)) <= max_width)
+            lo = mid;
+        else
+            hi = mid - 1;
+    }
+    prefix_len = lo;
+    if (prefix_len > 0) return text.substr(0, prefix_len);
+
+    return text.substr(0, 1);
+}
+
 void applyPpuScaledText(Sint16 p_x, Sint16 p_y, SDL_Surface* p_destination, const Fonts &p_fonts, const std::string &p_text, const SDL_Color &p_fg, const SDL_Color &p_bg, const T_TEXT_ALIGN p_align)
 {
     SDL_Surface *l_text = renderText(p_fonts, p_text, p_fg, p_bg);

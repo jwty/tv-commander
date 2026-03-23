@@ -12,8 +12,8 @@ struct Config {
     // Display settings
     int disp_width = SCREEN_WIDTH;
     int disp_height = SCREEN_HEIGHT;
-    float disp_ppu_x = PPU_X;
-    float disp_ppu_y = PPU_Y;
+    float disp_ppu_x = 1.0f;
+    float disp_ppu_y = 1.0f;
     bool disp_autoscale = static_cast<bool>(AUTOSCALE);
     bool disp_windowed = false;
 

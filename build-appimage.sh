@@ -22,8 +22,7 @@ set -x
 
 cmake -S. -B"$BUILD_DIR" \
   -DCMAKE_INSTALL_PREFIX="${APP_DIR}/usr" \
-  -DRES_DIR='"usr/share/commander/res/"' \
-  -DCMAKE_BUILD_TYPE=Release -DPPU_X=2 -DPPU_Y=2 "$@"
+  -DCMAKE_BUILD_TYPE=Release "$@"
 cmake --build "$BUILD_DIR" -j $(getconf _NPROCESSORS_ONLN)
 
 rm -rf "$APP_DIR"

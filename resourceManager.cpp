@@ -52,11 +52,6 @@ SDLSurfaceUniquePtr LoadSvgIcon(const char *svg_data, const std::string &color) 
     return SDLSurfaceUniquePtr { surf };
 }
 
-std::string ResDir = RES_DIR "";
-
-std::string ResPath(const char *path) { return ResDir + path; }
-std::string ResPath(const std::string &path) { return ResDir + path; }
-
 std::string ResolveFontPath(const std::string &family) {
     FcPattern *pattern = FcPatternCreate();
     if (!pattern) return { };
@@ -117,13 +112,6 @@ std::vector<TTF_Font *> LoadFonts() {
 }
 
 } // namespace
-
-void CResourceManager::SetResDir(const char *res_dir)
-{
-    ResDir = res_dir;
-    if (!ResDir.empty() && ResDir.back() != '/') ResDir += '/';
-    std::fprintf(stderr, "Set resource directory to %s\n", ResDir.c_str());
-}
 
 CResourceManager& CResourceManager::instance()
 {

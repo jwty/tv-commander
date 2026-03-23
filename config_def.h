@@ -1,12 +1,7 @@
 #ifndef CONFIG_DEF_H_
 #define CONFIG_DEF_H_
 
-// Defines for config defaults, so that they can be overriden via the build
-// system.
-
-#ifndef RES_DIR
-#define RES_DIR "res/"
-#endif
+// Defines for config defaults, overriden at runtime via config file
 
 #ifndef SCREEN_WIDTH
 #define SCREEN_WIDTH 320
@@ -16,19 +11,8 @@
 #define SCREEN_HEIGHT 240
 #endif
 
-#ifndef PPU_Y
-#define PPU_Y 1
-#endif
-#ifndef PPU_X
-#define PPU_X 1
-#endif
-
 #ifndef AUTOSCALE
 #define AUTOSCALE 1
-#endif
-
-#ifndef WINDOWED
-#define WINDOWED 0
 #endif
 
 #ifndef PATH_DEFAULT

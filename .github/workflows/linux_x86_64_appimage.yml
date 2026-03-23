@@ -23,8 +23,8 @@ jobs:
       shell: bash
       working-directory: ${{github.workspace}}/build
       run: |
-        cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DPPU_X=2 -DPPU_Y=2 \
-          -DCMAKE_INSTALL_PREFIX=$APP_DIR/usr -DRES_DIR='"usr/share/commander/res/"'
+        cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
+          -DCMAKE_INSTALL_PREFIX=$APP_DIR/usr
 
     - name: "CMake: Build"
       working-directory: ${{github.workspace}}/build

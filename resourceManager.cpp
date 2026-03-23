@@ -139,6 +139,7 @@ void CResourceManager::onResize()
         m_surfaces[T_SURFACE_FILE] = LoadSvgIcon(Icons::ICON_FILE_GENERIC, iconColor(g_palette.icon_file));
         m_surfaces[T_SURFACE_FILE_SYMLINK] = LoadSvgIcon(Icons::ICON_FILE_SYMLINK, iconColor(g_palette.icon_file));
         m_surfaces[T_SURFACE_FILE_IMAGE] = LoadSvgIcon(Icons::ICON_FILE_IMAGE, iconColor(g_palette.icon_file));
+        m_surfaces[T_SURFACE_FILE_VIDEO] = LoadSvgIcon(Icons::ICON_FILE_VIDEO, iconColor(g_palette.icon_file));
         m_surfaces[T_SURFACE_UP] = LoadSvgIcon(Icons::ICON_UP, iconColor(g_palette.icon_dir));
     }
 

@@ -414,6 +414,15 @@ std::string File_utils::getLowercaseFileExtension(const std::string &name)
     return ext;
 }
 
+// For convenience when browsing
+bool File_utils::isVideoExtension(const std::string &ext) {
+    return ext == "mp4" || ext == "mkv" || ext == "avi" || ext == "mov"
+        || ext == "webm" || ext == "flv" || ext == "wmv" || ext == "m4v"
+        || ext == "mpg" || ext == "mpeg" || ext == "3gp" || ext == "ogv"
+        || ext == "ts" || ext == "mts" || ext == "vob" || ext == "rm"
+        || ext == "rmvb";
+}
+
 const std::string File_utils::getFileName(const std::string &p_path)
 {
     size_t l_pos = p_path.rfind('/');

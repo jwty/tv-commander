@@ -37,6 +37,8 @@ SDL_Surface *CPanel::icon_file() const { return resources_.getSurface(CResourceM
 
 SDL_Surface *CPanel::icon_img() const { return resources_.getSurface(CResourceManager::T_SURFACE_FILE_IMAGE); }
 
+SDL_Surface *CPanel::icon_video() const { return resources_.getSurface(CResourceManager::T_SURFACE_FILE_VIDEO); }
+
 SDL_Surface *CPanel::icon_folder_symlink() const { return resources_.getSurface(CResourceManager::T_SURFACE_FOLDER_SYMLINK); }
 
 SDL_Surface *CPanel::icon_file_symlink() const { return resources_.getSurface(CResourceManager::T_SURFACE_FILE_SYMLINK); }
@@ -124,6 +126,8 @@ void CPanel::render(const bool p_active) const
                 const std::string &ext = m_fileLister[l_i].m_ext;
                 if (SDL_utils::isSupportedImageExt(ext))
                     l_surfaceTmp = icon_img();
+                else if (File_utils::isVideoExtension(ext))
+                    l_surfaceTmp = icon_video();
                 else
                     l_surfaceTmp = icon_file();
             }

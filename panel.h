@@ -87,6 +87,7 @@ class CPanel
     SDL_Surface *icon_dir() const;
     SDL_Surface *icon_file() const;
     SDL_Surface *icon_img() const;
+    SDL_Surface *icon_video() const;
     SDL_Surface *icon_folder_symlink() const;
     SDL_Surface *icon_file_symlink() const;
     SDL_Surface *icon_up() const;

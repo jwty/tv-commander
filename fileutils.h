@@ -32,6 +32,8 @@ namespace File_utils
 
     std::string getLowercaseFileExtension(const std::string &name);
 
+    bool isVideoExtension(const std::string &ext);
+
     const unsigned long int getFileSize(const std::string &p_file);
 
     void formatSize(std::string &p_size);

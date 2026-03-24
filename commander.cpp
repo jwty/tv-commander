@@ -335,6 +335,12 @@ const bool CCommander::openCopyMenu(void) const
                 }
                 return false;
             });
+
+            l_dialog.addOption("Show filename");
+            handlers.push_back([&]() {
+                File_utils::showMessage("Full filename:", File_utils::getFileName(m_panelSource->getHighlightedItemFull()));
+                return false;
+            });
         }
 
         l_dialog.addOption("Delete");
@@ -399,6 +405,7 @@ const bool CCommander::openSystemMenu(void)
         l_dialog.addOption("New file");
         l_dialog.addOption("Refresh panel");
         l_dialog.addOption("Disk info");
+        l_dialog.addOption("Show path");
         l_dialog.addOption("Quit");
         l_dialog.init();
         l_dialogRetVal = l_dialog.execute();
@@ -447,6 +454,10 @@ const bool CCommander::openSystemMenu(void)
             File_utils::diskInfo(m_panelSource->getCurrentPath());
             break;
         case 7:
+            // Show path
+            File_utils::showMessage("Current directory:", m_panelSource->getCurrentPath());
+            break;
+        case 8:
             // Quit
             m_retVal = -1;
             break;
@@ -479,9 +490,15 @@ OpenFileResult OpenFileDialog(const std::string &path,
     if (File_utils::getLowercaseFileExtension(path) == "opk")
         return OpenFileResult::EXECUTE;
 
+    const auto &fonts = CResourceManager::instance().getFonts();
+    std::string filename = File_utils::getFileName(path);
+    const int max_title_width = static_cast<int>(screen.actual_w * 0.7);
+    filename = SDL_utils::truncateMiddle(filename, max_title_width, fonts);
+    std::string title = filename + ":";
+
     if (!info.executable()) {
         // Non-executable: only show View and Open with (if available)
-        CDialog dlg { File_utils::getFileName(path) + ":" };
+        CDialog dlg { title };
         std::vector<OpenFileResult> options { OpenFileResult::CANCEL };
         const auto add_option = [&](std::string text, OpenFileResult value) {
             dlg.addOption(text);
@@ -495,7 +512,7 @@ OpenFileResult OpenFileDialog(const std::string &path,
     }
 
     // Executable: show View, Open with (if available), Execute
-    CDialog dlg { File_utils::getFileName(path) + ":" };
+    CDialog dlg { title };
     std::vector<OpenFileResult> options { OpenFileResult::CANCEL };
     const auto add_option = [&](std::string text, OpenFileResult value) {
         dlg.addOption(text);

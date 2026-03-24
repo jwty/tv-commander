@@ -10,6 +10,7 @@
 #include <iterator>
 #include <memory>
 #include <sstream>
+#include <vector>
 
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -26,7 +27,9 @@
 #include "def.h"
 #include "dialog.h"
 #include "error_dialog.h"
+#include "resourceManager.h"
 #include "sdlutils.h"
+#include "screen.h"
 #include "config.h"
 
 namespace
@@ -600,4 +603,17 @@ void File_utils::formatSize(std::string &p_size)
         p_size.insert(l_i, ",");
         l_i -= 3;
     }
+}
+
+void File_utils::showMessage(const std::string &title, const std::string &message)
+{
+    const int max_width = screen.actual_w - static_cast<int>(20 * screen.ppu_x);
+    CDialog dialog{title};
+    auto lines = SDL_utils::wrapText(message, CResourceManager::instance().getFonts(), max_width);
+    for (const auto &line : lines) {
+        dialog.addLabel(line);
+    }
+    dialog.addOption("OK");
+    dialog.init();
+    dialog.execute();
 }

@@ -60,6 +60,9 @@ namespace SDL_utils
     // Truncate text to fit width, inserting ellipsis in the middle
     std::string truncateMiddle(const std::string &text, int max_width, const Fonts &fonts, const std::string &ellipsis = "...");
 
+    // Wrap text into multiple lines that fit within max_width
+    std::vector<std::string> wrapText(const std::string &text, const Fonts &fonts, int max_width);
+
     // Equivalent to SDL_Rect { ... } but avoids -Wnarrowing.
     inline SDL_Rect makeRect(int x, int y, int w, int h)
     {

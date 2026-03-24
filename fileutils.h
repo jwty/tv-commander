@@ -49,6 +49,8 @@ namespace File_utils
     void diskInfo(const std::string &path);
 
     void diskUsed(const std::vector<std::string> &p_files);
+
+    void showMessage(const std::string &title, const std::string &message);
 }
 
 #endif

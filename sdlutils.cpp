@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <vector>
 
 #include "def.h"
 #include "fileutils.h"
@@ -186,6 +187,39 @@ std::string truncateMiddle(const std::string &text, int max_width, const Fonts &
     if (prefix_len > 0) return text.substr(0, prefix_len);
 
     return text.substr(0, 1);
+}
+
+std::vector<std::string> wrapText(const std::string &text, const Fonts &fonts, int max_width)
+{
+    std::vector<std::string> lines;
+    if (text.empty()) return lines;
+
+    std::string current_line;
+    std::string remaining = text;
+
+    while (!remaining.empty()) {
+        auto size = measureText(fonts, remaining);
+        if (size.first <= max_width) {
+            lines.push_back(remaining);
+            break;
+        }
+
+        int low = 0, high = remaining.size();
+        while (low + 1 < high) {
+            int mid = (low + high) / 2;
+            auto sub_size = measureText(fonts, remaining.substr(0, mid));
+            if (sub_size.first <= max_width)
+                low = mid;
+            else
+                high = mid;
+        }
+
+        if (low == 0) low = 1;
+        lines.push_back(remaining.substr(0, low));
+        remaining = remaining.substr(low);
+    }
+
+    return lines;
 }
 
 void applyPpuScaledText(Sint16 p_x, Sint16 p_y, SDL_Surface* p_destination, const Fonts &p_fonts, const std::string &p_text, const SDL_Color &p_fg, const SDL_Color &p_bg, const T_TEXT_ALIGN p_align)

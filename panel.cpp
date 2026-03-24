@@ -39,6 +39,8 @@ SDL_Surface *CPanel::icon_img() const { return resources_.getSurface(CResourceMa
 
 SDL_Surface *CPanel::icon_video() const { return resources_.getSurface(CResourceManager::T_SURFACE_FILE_VIDEO); }
 
+SDL_Surface *CPanel::icon_truncate_left() const { return resources_.getSurface(CResourceManager::T_SURFACE_TRUNCATE_LEFT); }
+
 SDL_Surface *CPanel::icon_folder_symlink() const { return resources_.getSurface(CResourceManager::T_SURFACE_FOLDER_SYMLINK); }
 
 SDL_Surface *CPanel::icon_file_symlink() const { return resources_.getSurface(CResourceManager::T_SURFACE_FILE_SYMLINK); }
@@ -77,18 +79,25 @@ void CPanel::render(const bool p_active) const
     SDL_Color l_color;
     SDL_Rect l_rect;
     // Current dir
+    int path_margin = static_cast<int>(6 * screen.ppu_x);
+    int max_display_width = width() - path_margin;
     l_surfaceTmp = SDL_utils::renderText(
         m_fonts, m_currentPath, g_palette.text_header, g_palette.panel);
-    if (l_surfaceTmp->w > width()) {
-        l_rect.x = l_surfaceTmp->w - width();
-        l_rect.y = 0;
-        l_rect.w = width();
-        l_rect.h = l_surfaceTmp->h;
-        SDL_utils::applyPpuScaledSurface(
-            m_x, header_padding_top(), l_surfaceTmp, screen.surface, &l_rect);
+    if (l_surfaceTmp->w <= max_display_width) {
+        // Path fits within margin
+        SDL_utils::applyPpuScaledSurface(m_x, header_padding_top(), l_surfaceTmp, screen.surface);
     } else {
-        SDL_utils::applyPpuScaledSurface(
-            m_x, header_padding_top(), l_surfaceTmp, screen.surface);
+        // Path exceeds panel, left clip with truncation icon
+        int icon_w = icon_truncate_left()->w + static_cast<int>(2 * screen.ppu_x);
+        int clip_width = width() - icon_w - path_margin;
+        if (clip_width > 0) {
+            l_rect.x = l_surfaceTmp->w - clip_width;
+            l_rect.y = 0;
+            l_rect.w = clip_width;
+            l_rect.h = l_surfaceTmp->h;
+            SDL_utils::applyPpuScaledSurface(m_x + icon_w, header_padding_top(), l_surfaceTmp, screen.surface, &l_rect);
+        }
+        SDL_utils::applyPpuScaledSurface(m_x, header_padding_top(), icon_truncate_left(), screen.surface);
     }
 
     SDL_FreeSurface(l_surfaceTmp);

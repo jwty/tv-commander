@@ -22,6 +22,7 @@ class CResourceManager
         T_SURFACE_FILE_SYMLINK,
         T_SURFACE_FILE_IMAGE,
         T_SURFACE_FILE_VIDEO,
+        T_SURFACE_TRUNCATE_LEFT,
         T_SURFACE_UP,
         T_SURFACE_CURSOR1,
         T_SURFACE_CURSOR2
@@ -53,7 +54,7 @@ class CResourceManager
     const CResourceManager &operator =(const CResourceManager &p_source) = delete;
 
     // Images
-    std::array<SDLSurfaceUniquePtr, 10> m_surfaces {};
+    std::array<SDLSurfaceUniquePtr, 11> m_surfaces {};
 
     // Fonts
     Fonts m_fonts;

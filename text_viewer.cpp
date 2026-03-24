@@ -102,19 +102,22 @@ void TextViewer::init()
     }
     // Print title
     {
-        SDLSurfaceUniquePtr tmp { SDL_utils::renderText(
-            fonts, filename_, g_palette.text_header, g_palette.panel) };
-        SDL_Rect rect;
-        SDL_Rect *clip_rect = nullptr;
-        if (tmp->w > background_->w - 2 * VIEWER_PADDING_X_PHYS) {
-            rect.x = tmp->w - (background_->w - 2 * VIEWER_PADDING_X_PHYS);
+        SDL_Surface *truncate_icon = CResourceManager::instance().getSurface(CResourceManager::T_SURFACE_TRUNCATE_LEFT);
+        int icon_w = truncate_icon->w + VIEWER_PADDING_X_PHYS;
+        int max_display_width = background_->w - 4 * VIEWER_PADDING_X_PHYS - icon_w;
+
+        SDLSurfaceUniquePtr tmp { SDL_utils::renderText(fonts, filename_, g_palette.text_header, g_palette.panel) };
+        if (tmp->w > max_display_width) {
+            SDL_Rect rect;
+            rect.x = tmp->w - max_display_width;
             rect.y = 0;
-            rect.w = background_->w - 2 * VIEWER_PADDING_X_PHYS;
+            rect.w = max_display_width;
             rect.h = tmp->h;
-            clip_rect = &rect;
+            SDL_utils::applyPpuScaledSurface(VIEWER_PADDING_X_PHYS + icon_w, HEADER_PADDING_TOP_PHYS, tmp.get(), background_.get(), &rect);
+            SDL_utils::applyPpuScaledSurface(VIEWER_PADDING_X_PHYS, HEADER_PADDING_TOP_PHYS, truncate_icon, background_.get());
+        } else {
+            SDL_utils::applyPpuScaledSurface(VIEWER_PADDING_X_PHYS, HEADER_PADDING_TOP_PHYS, tmp.get(), background_.get());
         }
-        SDL_utils::applyPpuScaledSurface(VIEWER_PADDING_X_PHYS,
-            HEADER_PADDING_TOP_PHYS, tmp.get(), background_.get(), clip_rect);
     }
     clip_.w = screen.actual_w - 2 * VIEWER_PADDING_X_PHYS;
 }
@@ -320,15 +323,8 @@ bool TextViewer::moveRight()
 bool TextViewer::editLine()
 {
     std::string title = lines_for_display_[current_line_];
-    constexpr std::size_t kMaxTitleLen = 60;
-    if (title.size() > kMaxTitleLen) {
-        std::size_t len = kMaxTitleLen - 3;
-        if (!utf8::isTrailByte(title[len])) {
-            while (len > 0 && utf8::isTrailByte(title[len - 1])) --len;
-        }
-        title.resize(len);
-        title.append("...");
-    }
+    const int max_title_width = static_cast<int>(screen.actual_w * 0.7);
+    title = SDL_utils::truncateMiddle(title, max_title_width, fonts_);
     title = "Line " + std::to_string(current_line_ + 1) + ": " + title;
     CDialog dialog { title };
     dialog.addLabel("Saved automatically");

@@ -44,7 +44,7 @@ void ImageViewer::init()
     }
 }
 
-void ImageViewer::setPath(std::string &&path)
+void ImageViewer::setPath(const std::string &path)
 {
     filename_ = std::move(path);
     image_ = nullptr;
@@ -62,7 +62,7 @@ void ImageViewer::onResize()
     image_ = nullptr;
     background_ = nullptr;
     init();
-    setPath(std::move(filename_));
+    setPath(filename_);
 }
 
 void ImageViewer::render(const bool focused) const

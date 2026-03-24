@@ -20,7 +20,7 @@ class ImageViewer : public CWindow {
     bool ok() const { return ok_; }
 
   private:
-    void setPath(std::string &&path);
+    void setPath(const std::string &path);
     void init();
     void render(const bool focused) const override;
 
